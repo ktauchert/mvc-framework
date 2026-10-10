@@ -1,13 +1,17 @@
-# Dokumentation
+# Documentation
 
-Ernstes Framework, Kern schrittweise selbst gebaut.
+Serious framework. The core is built step by step.
 
-| Ort | Zweck |
+| Location | Purpose |
 |---|---|
-| [roadmap.md](roadmap.md) | Phasen, PHP-Lernfokus, Fertig-Kriterien |
-| [adr/](adr/) | *Warum* (Entscheidungen) |
-| `AGENTS.md` | Companion: was der Agent braucht, was er nicht tut |
+| [roadmap.md](roadmap.md) | Phases, PHP learning focus, done-when |
+| [adr/](adr/) | *Why* (decisions) |
+| [../README.md](../README.md) | Project overview |
+| [../CONTRIBUTING.md](../CONTRIBUTING.md) | How to work in this repo |
+| [../AGENTS.md](../AGENTS.md) | Companion: what the agent needs and must not do |
 
-**Accepted:** 0001–0011 (0009 Page-Builder-Flavor, 0011 PHP 8.4 + strict types).
+**Accepted:** ADR-0001 through ADR-0011.
 
-**Später, nach der jeweiligen Welle:** Auth-Details, Migrationssystem, Create-Project, MySQL/SQLite, Medien, SSR, `make:block`.
+**Later, after the matching wave:** auth details, migration system, create-project, MySQL/SQLite, media, SSR, `make:block`.
+
+Language: English (identifiers, comments, docs).

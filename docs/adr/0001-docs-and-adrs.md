@@ -1,24 +1,24 @@
-# ADR-0001: Docs und ADRs statt Architektur in AGENTS.md
+# ADR-0001: Docs and ADRs instead of architecture in AGENTS.md
 
 - Status: Accepted
-- Datum: 2026-10-10
+- Date: 2026-10-10
 
-## Kontext
+## Context
 
-`AGENTS.md` wurde als Sammelstelle für Zielbild, Ordnerbaum, Laravel-Vergleich und Routing genutzt. Die Datei ist für Agent-Verhalten gedacht. Architektur soll diskutiert und versioniert werden, nicht stillschweigend in Prompt-Text wachsen.
+`AGENTS.md` was used as a dump for the target picture, folder tree, Laravel comparison, and routing. That file is for agent behaviour. Architecture should be discussed and versioned, not grown silently inside prompt text.
 
-## Alternativen
+## Alternatives
 
-1. Alles in `AGENTS.md` halten — kurzfristig bequem, vermischt Rollen, keine Entscheidungshistorie.
-2. Ein großes `architecture.md` ohne ADRs — lesbar, aber „warum nicht Inertia?“ verschwindet.
-3. `docs/` plus einzelne ADRs.
+1. Keep everything in `AGENTS.md` — convenient short term, mixed roles, no decision history.
+2. One large `architecture.md` without ADRs — readable, but “why not Inertia?” disappears.
+3. `docs/` plus one ADR per decision.
 
-## Entscheidung
+## Decision
 
-- `AGENTS.md`: nur Coach-Regeln, Verweis auf `docs/`.
-- `docs/adr/`: eine Entscheidung pro Datei.
-- Kein zweites Architektur-Wiki, das ADRs doppel.
+- `AGENTS.md`: coach rules only, pointer to `docs/`.
+- `docs/adr/`: one decision per file.
+- No second architecture wiki that duplicates ADRs.
 
-## Folgen
+## Consequences
 
-Neue Wege zuerst als Proposed-ADR, dann akzeptieren oder verwerfen. Chat bleibt Erörterung; die Entscheidung landet im ADR.
+New directions start as a Proposed ADR, then accept or reject. Chat is discussion; the decision lands in the ADR.

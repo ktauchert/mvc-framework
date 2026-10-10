@@ -1,59 +1,59 @@
-# ADR-0009: Headless Page-Builder (Sanity-Muster) als Flavor, nicht als HTTP-Kern
+# ADR-0009: Headless page builder (Sanity pattern) as a flavor, not the HTTP kernel
 
 - Status: Accepted
-- Datum: 2026-10-10
+- Date: 2026-10-10
 
-## Kontext
+## Context
 
-Zielbild sind u. a. **Firmenkunden-Websites**: schnell eine Seite anlegen und befüllen, ohne Deploy. Referenz: [fahrschule-rookie](https://github.com/ktauchert/fahrschule-rookie) — Next.js + Sanity, **Page Builder**: Entwickler definiert Module (Hero, Teaser, Locations), Studio bietet sie zur Auswahl, die Page ist eine Liste `{ type, …felder }`, `ModuleRenderer` mappt `type` auf React-Komponenten.
+The target includes **company marketing sites**: create and fill a page quickly, without a deploy. Reference: [fahrschule-rookie](https://github.com/ktauchert/fahrschule-rookie) — Next.js + Sanity, **page builder**: the developer defines modules (Hero, Teaser, Locations), Studio offers them as choices, a page is a list `{ type, …fields }`, `ModuleRenderer` maps `type` to React components.
 
-Dasselbe Konstrukt hier: PHP-API + Postgres statt Sanity, Admin-SPA statt Studio, öffentliche TanStack-SPA statt Next `[slug]`. React-Blöcke zuerst (0004); Vue-Blöcke später als Frontend-Adapter (0006).
+The same construct here: PHP API + Postgres instead of Sanity, admin SPA instead of Studio, public TanStack SPA instead of Next `[slug]`. React blocks first (0004); Vue blocks later as a frontend adapter (0006).
 
-Das ist **kein** Kernel-Feature am Tag 1. Es ist ein **Flavor/Modul auf dem Kern**. Ohne Vorentscheidung wird Nachrüsten teuer (kein JSONB, keine Slug-Pages, Writes ohne Auth, feste Controller pro Marketing-Seite).
+This is **not** a kernel feature on day one. It is a **flavor/module on top of the core**. Without a prior decision, retrofitting is expensive (no JSONB, no slug pages, writes without auth, one controller per marketing page).
 
-## Abbildung Sanity → dieses Framework
+## Mapping Sanity → this framework
 
-| Sanity / Fahrschule | Hier |
+| Sanity / driving school | Here |
 |---|---|
-| Schema (`heroCtaModule`) | Block-Typ: Name + Feldliste (Validierung in PHP) |
-| Studio | Admin-SPA, Auth, `POST/PATCH /api/pages` |
-| GROQ + Dataset | `GET /api/pages/{slug}` aus Postgres |
-| `modules[]` | JSONB-Array `[{ "type": "hero", "headline": "…" }, …]` |
-| `ModuleRenderer` | React-Map `type` → Komponente |
-| `app/[slug]` | TanStack-Route `/$slug` (CMS-Pages), nicht jede App-Route |
+| Schema (`heroCtaModule`) | Block type: name + field list (validation in PHP) |
+| Studio | Admin SPA, auth, `POST/PATCH /api/pages` |
+| GROQ + dataset | `GET /api/pages/{slug}` from Postgres |
+| `modules[]` | JSONB array `[{ "type": "hero", "headline": "…" }, …]` |
+| `ModuleRenderer` | React map `type` → component |
+| `app/[slug]` | TanStack route `/$slug` (CMS pages), not every app route |
 
-Entwickler schreibt Komponenten **und** registriert den Block-Typ. Redakteur wählt nur registrierte Typen — kein freies HTML-CMS.
+The developer writes components **and** registers the block type. Editors pick only registered types — not a free-HTML CMS.
 
-## Alternativen
+## Alternatives
 
-1. Nur Code-Pages — Firmenkunde kann nicht befüllen.
-2. Page-Builder in den Kernel — HTTP/PDO/Auth gehen unter.
-3. Weiter Sanity daneben — zweites Backend, widerspricht „eine PHP-API“.
-4. **Kern headless-fähig; Page-Builder = späteres Modul** mit festem Datenvertrag (Seite + Blöcke JSONB + Registry).
+1. Code-only pages — the company customer cannot fill content.
+2. Page builder in the kernel — HTTP/PDO/auth get buried.
+3. Keep Sanity beside us — a second backend, contradicts “one PHP API”.
+4. **Core stays headless-capable; page builder = later module** with a fixed data contract (page + blocks JSONB + registry).
 
-## Entscheidung
+## Decision
 
-Variante 4.
+Option 4.
 
-**Kernel / jetzt nur vorbereiten:**
+**Kernel / prepare now:**
 
-- Persistenz kann JSON/JSONB (Postgres kann das).
-- Ressourcen mit `slug`; öffentliche Reads vs. geschützte Writes (Auth folgt).
-- App-Routen (Login, Admin) bleiben Code (0005). CMS-Seiten sind *eine* dynamische Route plus API.
-- Kein Studio, keine Medienbibliothek, kein Block-Katalog im ersten Kern.
+- Persistence can store JSON/JSONB (Postgres can).
+- Resources with `slug`; public reads vs protected writes (auth follows).
+- App routes (login, admin) stay code (0005). CMS pages are *one* dynamic route plus API.
+- No studio, media library, or block catalog in the first kernel.
 
-**Modul später (eigener ADR, nach Auth + erster Tabelle):**
+**Module later (own ADR, after auth + first table):**
 
-- Tabelle `pages` (slug, title, status, `modules` JSONB, timestamps).
-- Block-Registry (erlaubte `type`s + Schema); API lehnt unbekannte Typen ab.
-- Admin-UI: Seite anlegen, Blöcke wählen/befüllen/sortieren.
-- Öffentliche SPA: Renderer wie in der Fahrschule. Sitemap/Robots: ADR-0010.
-- Optional `make:block hero` erzeugt React-Komponente + Registry-Eintrag (DX, 0005/0006).
+- Table `pages` (slug, title, status, `modules` JSONB, timestamps).
+- Block registry (allowed `type`s + schema); API rejects unknown types.
+- Admin UI: create a page, pick/fill/sort blocks.
+- Public SPA: renderer like the driving-school site. Sitemap/robots: ADR-0010.
+- Optional `make:block hero` creates a React component + registry entry (DX, 0005/0006).
 
-Login bleibt Code. Nicht jede Page ist ein Builder-Dokument.
+Login stays code. Not every page is a builder document.
 
-## Folgen
+## Consequences
 
-- Firmenkunden-Produkt ist ein Flavor, Create-Project kann es später anbieten.
-- Nachrüsten = Modul + JSONB + eine Catch-all-Route, kein zweites Routing-Modell.
-- Vue-Komponenten im Admin „zur Wahl“ = zweiter Frontend-Adapter, gleicher JSON-Vertrag.
+- The company-site product is a flavor; create-project can offer it later.
+- Retrofit = module + JSONB + one catch-all route, not a second routing model.
+- Vue components as admin choices = second frontend adapter, same JSON contract.

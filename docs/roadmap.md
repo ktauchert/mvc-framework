@@ -1,253 +1,253 @@
-# Umsetzungsplan
+# Implementation plan
 
-Du baust den Kern **phaseweise selbst**. Der Agent ist Companion (Review, Erklärung, nächster Happen) — siehe `AGENTS.md`. Architektur: `docs/adr/`.
+You build the core **phase by phase**. The agent is a companion (review, explanation, next bite) — see `AGENTS.md`. Architecture: `docs/adr/`.
 
-**So arbeitest du eine Phase:** Nummer nennen → kurz lesen (PHP-Fokus + Quellen) → selbst bauen → Companion zum Review holen → erst dann die nächste. Generator und CMS nicht vorziehen.
+**How to work a phase:** state the id → skim (PHP focus + sources) → build it yourself → ask the companion for review → only then the next phase. Do not pull the generator or CMS forward.
 
-**Immer an:** `declare(strict_types=1);`, Namespaces, typisierte Properties/Parameter/Returns, PDO nur mit `prepare`. Englische Bezeichner.
+**Always on:** `declare(strict_types=1);`, namespaces, typed properties/parameters/returns, PDO only with `prepare`. English identifiers, comments, and docs.
 
-Ziel-PHP: **≥ 8.4** (ADR-0011).
+Target PHP: **≥ 8.4** (ADR-0011).
 
 ```
-public/                 Front Controller (einziges Web-Root)
+public/                 Front controller (only web root)
 src/Framework/          Kernel (Http, Routing, Database, …)
-app/                    Deine App (Controllers, Models)
+app/                    Your app (controllers, models)
 config/  routes/  storage/
-frontend/               ab Welle 4 (React + TanStack)
+frontend/               from wave 4 (React + TanStack)
 ```
 
 ---
 
-## Welle 0 — Werkzeugkasten
+## Wave 0 — Toolbox
 
-### Phase 0.1 — Umgebung
+### Phase 0.1 — Environment
 
-**Ziel:** PHP 8.4+, Composer, Git, Docker. Postgres-Container startet; PHP darf zuerst **auf dem Host** laufen (`php -S`), wenn `pdo_pgsql` da ist.
+**Goal:** PHP 8.4+, Composer, Git, Docker. Postgres container starts; PHP may run **on the host** first (`php -S`) if `pdo_pgsql` is present.
 
-**PHP-Fokus:** Version prüfen (`php -v`, `php -m` enthält `pdo_pgsql`). Noch kein OOP-Zwang.
+**PHP focus:** Check version (`php -v`, `php -m` includes `pdo_pgsql`). No OOP requirement yet.
 
-**Du:** Git init falls nötig. `.gitignore` (`/vendor`, `.env`, `node_modules`, IDE). `.env.example` mit Postgres-Platzhaltern. `docker-compose.yml` nur Postgres, Credentials aus `.env`. `composer.json` mit PSR-4 `Framework\\` → `src/Framework/`, `App\\` → `app/`, Script `serve` → `php -S localhost:8000 -t public public/router.php` (Router-Datei in 1.1).
+**You:** Git init if needed. `.gitignore` (`/vendor`, `.env`, `node_modules`, IDE, `.obsidian`). `.env.example` with Postgres placeholders. `docker-compose.yml` for Postgres only, credentials from `.env`. `composer.json` with PSR-4 `Framework\\` → `src/Framework/`, `App\\` → `app/`, script `serve` → `php -S localhost:8000 -t public public/router.php` (router file in 1.1).
 
-**Fertig wenn:** `docker compose up -d` und `psql`/Client verbindet; `composer dump-autoload` läuft; keine Secrets im Git.
+**Done when:** `docker compose up -d` and a client can connect; `composer dump-autoload` works; no secrets in Git.
 
-**Quellen:** [php.net/install](https://www.php.net/manual/en/install.php) · [getcomposer.org](https://getcomposer.org) · [PDO PostgreSQL](https://www.php.net/manual/en/ref.pdo-pgsql.php)
+**Sources:** [php.net/install](https://www.php.net/manual/en/install.php) · [getcomposer.org](https://getcomposer.org) · [PDO PostgreSQL](https://www.php.net/manual/en/ref.pdo-pgsql.php)
 
-**Nicht:** Frontend, Laravel installieren, PHP-FPM-Cluster.
+**Do not:** frontend, install Laravel, PHP-FPM cluster.
 
-### Phase 0.2 — OOP-Auffrischung (Lesen, wenig Code)
+### Phase 0.2 — OOP refresh (reading, little code)
 
-**Ziel:** Die Sprache, die du ab 1.1 brauchst, einmal gesehen haben.
+**Goal:** See the language you need from 1.1 onward once.
 
-**PHP-Fokus:** Klasse, Objekt, `public`/`private`/`protected`, Constructor Property Promotion, `readonly`, Namespaces + `use`, `declare(strict_types=1)` (sonst werden `int`-Hints koerziv). Optional: `enum`, `match`.
+**PHP focus:** Class, object, `public`/`private`/`protected`, constructor property promotion, `readonly`, namespaces + `use`, `declare(strict_types=1)` (otherwise `int` hints coerce). Optional: `enum`, `match`.
 
-**Fertig wenn:** Du kannst erklären, was Promotion vs. klassische Properties ist, und warum `strict_types` in *jeder* Datei stehen muss (gilt nur dateiweise).
+**Done when:** You can explain promotion vs classic properties, and why `strict_types` must sit in *every* file (it is per-file).
 
-**Quellen:** [Classes](https://www.php.net/manual/en/language.oop5.php) · [Namespaces](https://www.php.net/manual/en/language.namespaces.php) · [strict_types](https://www.php.net/manual/en/language.types.declarations.php#language.types.declarations.strict) · [Constructor promotion](https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.constructor.promotion) · [Readonly](https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.readonly-properties)
+**Sources:** [Classes](https://www.php.net/manual/en/language.oop5.php) · [Namespaces](https://www.php.net/manual/en/language.namespaces.php) · [strict_types](https://www.php.net/manual/en/language.types.declarations.php#language.types.declarations.strict) · [Constructor promotion](https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.constructor.promotion) · [Readonly](https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.readonly-properties)
 
 ---
 
-## Welle 1 — HTTP-Kern (ohne DB)
+## Wave 1 — HTTP core (no database)
 
-### Phase 1.1 — Front Controller + Autoload
+### Phase 1.1 — Front controller + autoload
 
-**Ziel:** Ein HTTP-Einstieg. Keine Logik in zehn PHP-Dateien unter der URL.
+**Goal:** One HTTP entry. No logic in ten PHP files under the URL.
 
-**PHP-Fokus:** `public/index.php` ohne Namespace (Einstieg). Rest unter `Framework\`. Autoload vs. `require`.
+**PHP focus:** `public/index.php` without a namespace (entry). Everything else under `Framework\`. Autoload vs `require`.
 
-**Du:** `public/index.php` lädt `vendor/autoload.php`, startet `Framework\Application`. `public/router.php` für den Built-in-Server: existierende Datei ausliefern, sonst `index.php`. Application darf zuerst nur `echo` JSON `{"ok":true}` — bewusst dünn.
+**You:** `public/index.php` loads `vendor/autoload.php`, starts `Framework\Application`. `public/router.php` for the built-in server: serve an existing file, otherwise `index.php`. Application may at first only `echo` JSON `{"ok":true}` — thin on purpose.
 
-**Fertig wenn:** `composer serve` (oder `php -S …`) → `GET /` liefert JSON, Status 200.
+**Done when:** `composer serve` (or `php -S …`) → `GET /` returns JSON, status 200.
 
-**Quellen:** Front Controller (Konzept) · Composer PSR-4
+**Sources:** Front controller (concept) · Composer PSR-4
 
-**Nicht:** Router-Vollausbau in derselben Session wie „Hello JSON“, wenn du überlädst — lieber 1.2.
+**Do not:** Full router in the same session as “hello JSON” if you overload — prefer 1.2.
 
-### Phase 1.2 — Request und Response
+### Phase 1.2 — Request and Response
 
-**Ziel:** `$_GET`/`$_SERVER`/`php://input` nicht quer durch den Code. Antwort = Objekt, das `send()` macht.
+**Goal:** `$_GET`/`$_SERVER`/`php://input` not scattered. The answer is an object that `send()`s.
 
-**PHP-Fokus:** `readonly` Properties, `self`/`static` Factory `Request::capture()`, Return-Typen `array`, `string`, `int`, `never` bei `send()` (terminiert). JSON: `json_encode` + Header `Content-Type: application/json`.
+**PHP focus:** `readonly` properties, `self`/`static` factory `Request::capture()`, return types `array`, `string`, `int`, `never` on `send()` (terminates). JSON: `json_encode` + header `Content-Type: application/json`.
 
-**Du:** `Framework\Http\Request` (`method()`, `path()`, `query()`, `json()` aus `php://input`), `Framework\Http\Response` mit `json()`, `status()`, `header()`. Application: Request bauen, Response senden. `json()` darf bei leerem Body `[]`/`null` liefern, bei ungültigem JSON lieber Exception als stilles `[]`.
+**You:** `Framework\Http\Request` (`method()`, `path()`, `query()`, `json()` from `php://input`), `Framework\Http\Response` with `json()`, `status()`, `header()`. Application: build Request, send Response. Empty body from `json()` may be `[]`/`null`; invalid JSON should throw rather than silently `[]`.
 
-**Fertig wenn:** Du Status 201 und einen JSON-Body setzen kannst, ohne `echo` in der Application.
+**Done when:** You can set status 201 and a JSON body without `echo` in Application.
 
-**Quellen:** [Superglobals](https://www.php.net/manual/en/language.variables.superglobals.php) · [json_encode](https://www.php.net/json-encode)
+**Sources:** [Superglobals](https://www.php.net/manual/en/language.variables.superglobals.php) · [json_encode](https://www.php.net/json-encode)
 
 ### Phase 1.3 — Router
 
-**Ziel:** Methode + Pfad → Callable. Parameter `{id}`. 404 / 405.
+**Goal:** Method + path → callable. `{id}` parameters. 404 / 405.
 
-**PHP-Fokus:** `enum HttpMethod: string`. `match` für Method-Dispatch wenn es hilft. Regex vs. einfache Segment-Maps — nimm das, das du erklären kannst. Keine Magie.
+**PHP focus:** `enum HttpMethod: string`. `match` for method dispatch if it helps. Regex vs simple segment maps — pick what you can explain. No magic.
 
-**Du:** `GET /api/health` → Closure oder Array `[Klasse, 'methode']` die JSON zurückgibt. Noch kein DB-Ping.
+**You:** `GET /api/health` → closure or `[Class, 'method']` that returns JSON. No DB ping yet.
 
-**Fertig wenn:** Unbekannte URL 404 JSON; `POST /api/health` wenn nur GET registriert → 405; `{id}` kommt als Argument oder Request-Attribut an.
+**Done when:** Unknown URL → 404 JSON; `POST /api/health` when only GET is registered → 405; `{id}` arrives as an argument or request attribute.
 
-**Quellen:** [Enums](https://www.php.net/manual/en/language.enumerations.php) · [match](https://www.php.net/manual/en/control-structures.match.php)
+**Sources:** [Enums](https://www.php.net/manual/en/language.enumerations.php) · [match](https://www.php.net/manual/en/control-structures.match.php)
 
-**Nicht:** Middleware-Pipeline, Attribute-Routing (kann später).
+**Do not:** Middleware pipeline, attribute routing (can come later).
 
 ### Phase 1.4 — Controller
 
-**Ziel:** App-Code in `App\Controllers\…`, Kernel in `Framework\`.
+**Goal:** App code in `App\Controllers\…`, kernel in `Framework\`.
 
-**PHP-Fokus:** Klassenmethoden mit typisiertem `Request $request`: `Response`. Instantiierung erst einfach (`new`), Container erst wenn du Abhängigkeiten wirklich brauchst.
+**PHP focus:** Class methods with typed `Request $request`: `Response`. Instantiate simply (`new`) first; a container only when you really need dependencies.
 
-**Du:** `routes/api.php` registriert `HealthController::show`. Controller `return Response::json([...])`.
+**You:** `routes/api.php` registers `HealthController::show`. Controller `return Response::json([...])`.
 
-**Fertig wenn:** Neue API-Methode = neue Controller-Methode + eine Zeile Route, Kernel unverändert.
-
----
-
-## Welle 2 — Persistenz
-
-### Phase 2.1 — Env und Config
-
-**Ziel:** DSN, User, Passwort nicht im PHP-Quelltext.
-
-**PHP-Fokus:** `private` Parser, `static` nur wo es Config wirklich global ist — oder ein `Config`-Objekt aus Application. Kein `extract()`.
-
-**Du:** `.env` laden (selbst oder eine **kleine** lib, die du verstehst). `config/database.php` gibt Array für PDO. Nie `.env` committen.
-
-**Fertig wenn:** Host/Port/DB/Name/Passwort ändern ohne PHP-Klassen anzufassen.
-
-**Quellen:** [putenv/getenv](https://www.php.net/manual/en/function.getenv.php) — oder Dotenv-Doku, falls du eine lib nimmst.
-
-### Phase 2.2 — PDO-Connection
-
-**Ziel:** Eine Connection-Klasse, DSN `pgsql:…`, `ERRMODE_EXCEPTION`, Prepared Statements.
-
-**PHP-Fokus:** Dependency: Application hält `PDO` oder `Connection`. Exceptions, nicht `or die()`.
-
-**Du:** `GET /api/health` macht `SELECT 1` (ping). Fehler → JSON 500, keine HTML-Warnung.
-
-**Fertig wenn:** Compose-Postgres down → klarer Fehler; up → health ok. Nirgends String-SQL mit Interpolation.
-
-**Quellen:** [PDO](https://www.php.net/manual/en/book.pdo.php) · [PDO::prepare](https://www.php.net/manual/en/pdo.prepare.php) · [Connections](https://www.php.net/manual/en/pdo.connections.php)
-
-### Phase 2.3 — Erstes Schema + Model
-
-**Ziel:** Eine Übungs-Ressource (z. B. `notes`: id, title, body, timestamps) — **nicht** das CMS.
-
-**PHP-Fokus:** Model als Klasse um eine Tabelle, typisierte Getter oder readonly DTOs nach `fetch`. `declare(strict_types=1)` + PDO `FETCH`-Arrays in Objekte überführen (Casts bewusst).
-
-**Du:** SQL-Datei `storage/schema.sql` (Baby-Migration; echtes Migrationssystem = späterer ADR). Von Hand oder Mini-CLI anwenden. `GET/POST /api/notes`, `GET /api/notes/{id}`. POST: JSON-Body, `title` Pflicht — sonst 422 JSON, kein stilles Leerspeichern.
-
-**Fertig wenn:** Note anlegen und lesen über HTTP, Daten in Postgres sichtbar, SQL nur prepared.
-
-**Nicht:** Page-Builder, User-Auth, Datei-Upload.
+**Done when:** A new API method = a new controller method + one route line; kernel unchanged.
 
 ---
 
-## Welle 3 — Härten
+## Wave 2 — Persistence
 
-### Phase 3.1 — Fehler und JSON-Konsistenz
+### Phase 2.1 — Env and config
 
-**Ziel:** Ungefangene Exceptions und 404 sehen gleich aus (`{ "error": "…", "status": n }`), kein Stacktrace in Produktion (`APP_DEBUG`).
+**Goal:** DSN, user, password not in PHP source.
 
-**PHP-Fokus:** `Throwable`, `try/catch` in Kernel, eigene Exception-Klassen (`NotFoundException`) mit typed Properties.
+**PHP focus:** `private` parser, `static` only where config is truly global — or a `Config` object from Application. No `extract()`.
+
+**You:** Load `.env` (yourself or a **small** lib you understand). `config/database.php` returns an array for PDO. Never commit `.env`.
+
+**Done when:** Host/port/database/name/password change without touching PHP classes.
+
+**Sources:** [putenv/getenv](https://www.php.net/manual/en/function.getenv.php) — or dotenv docs if you take a lib.
+
+### Phase 2.2 — PDO connection
+
+**Goal:** One Connection class, DSN `pgsql:…`, `ERRMODE_EXCEPTION`, prepared statements.
+
+**PHP focus:** Dependency: Application holds `PDO` or `Connection`. Exceptions, not `or die()`.
+
+**You:** `GET /api/health` runs `SELECT 1` (ping). Failure → JSON 500, no HTML warning.
+
+**Done when:** Compose Postgres down → clear error; up → health ok. No interpolated SQL strings anywhere.
+
+**Sources:** [PDO](https://www.php.net/manual/en/book.pdo.php) · [PDO::prepare](https://www.php.net/manual/en/pdo.prepare.php) · [Connections](https://www.php.net/manual/en/pdo.connections.php)
+
+### Phase 2.3 — First schema + model
+
+**Goal:** A practice resource (e.g. `notes`: id, title, body, timestamps) — **not** the CMS.
+
+**PHP focus:** Model as a class around a table, typed getters or readonly DTOs after `fetch`. `declare(strict_types=1)` + turn PDO `FETCH` arrays into objects (casts on purpose).
+
+**You:** SQL file `storage/schema.sql` (baby migration; a real migration system = later ADR). Apply by hand or a tiny CLI. `GET/POST /api/notes`, `GET /api/notes/{id}`. POST: JSON body, `title` required — otherwise 422 JSON, no silent empty insert.
+
+**Done when:** Create and read a note over HTTP, row visible in Postgres, SQL only prepared.
+
+**Do not:** Page builder, user auth, file upload.
+
+---
+
+## Wave 3 — Hardening
+
+### Phase 3.1 — Errors and JSON consistency
+
+**Goal:** Uncaught exceptions and 404 look the same (`{ "error": "…", "status": n }`), no stack trace in production (`APP_DEBUG`).
+
+**PHP focus:** `Throwable`, `try/catch` in the kernel, own exception classes (`NotFoundException`) with typed properties.
 
 ### Phase 3.2 — Middleware
 
-**Ziel:** Pipeline: Request rein, Response raus. CORS für Vite (`localhost:5173`) vor Welle 4. Optional JSON-only für `/api`.
+**Goal:** Pipeline: Request in, Response out. CORS for Vite (`localhost:5173`) before wave 4. Optional JSON-only for `/api`.
 
-**PHP-Fokus:** Interface `MiddlewareInterface`, Callable-Kette. Keine globalen Flags.
+**PHP focus:** Interface `MiddlewareInterface`, callable chain. No global flags.
 
-### Phase 3.3 — Erste Tests
+### Phase 3.3 — First tests
 
-**Ziel:** PHPUnit (oder Pest, wenn du es lesen kannst) gegen Router/Controller **ohne** Browser. Ernstes Framework (0008).
+**Goal:** PHPUnit (or Pest if you can read it) against router/controller **without** a browser. Serious framework (0008).
 
-**PHP-Fokus:** Autoload `tests/`, Namespaces `Tests\`.
+**PHP focus:** Autoload `tests/`, namespace `Tests\`.
 
-**Fertig wenn:** Ein Test 404, einer Health oder Notes — `composer test` grün.
+**Done when:** One test for 404, one for health or notes — `composer test` green.
 
-**Nicht:** 90 % Coverage erzwingen. Tests, die die echte Docker-DB brauchen, klar kennzeichnen oder für CI später; Kernel-Tests zuerst ohne Netz.
+**Do not:** Force 90% coverage. Tests that need the real Docker DB should be labelled or wait for CI; kernel tests first without the network.
 
 ---
 
-## Welle 4 — Erste SPA (von Hand)
+## Wave 4 — First SPA (by hand)
 
 ### Phase 4.1 — Vite + React + TanStack Router
 
-**Ziel:** Eigenes `npm`-Init im Ordner `frontend/` (ADR-0003: Composer fasst das nicht an). Eine Route `/notes`, `fetch('/api/notes')`.
+**Goal:** Own `npm` init in `frontend/` (ADR-0003: Composer does not touch it). One route `/notes`, `fetch('/api/notes')`.
 
-**PHP-Fokus:** keiner — außer CORS/Proxy.
+**PHP focus:** none — except CORS/proxy.
 
-**Du:** Vite-Dev-Proxy `/api` → `localhost:8000`. File-based Route wie TanStack es vorsieht.
+**You:** Vite dev proxy `/api` → `localhost:8000`. File-based routes the TanStack way.
 
-**Fertig wenn:** Liste der Notes aus Postgres in der Seite, ohne PHP-HTML.
+**Done when:** Notes from Postgres show on the page, no PHP HTML.
 
-**Quellen:** Vite · TanStack Router file-based routing · `fetch` + JSON
+**Sources:** Vite · TanStack Router file-based routing · `fetch` + JSON
 
-**Nicht:** `make:page`, Admin-CMS, Start/SSR.
+**Do not:** `make:page`, admin CMS, Start/SSR.
 
-### Phase 4.2 — SPA-Fallback
+### Phase 4.2 — SPA fallback
 
-**Ziel:** Reload auf `/notes` in Produktion: PHP gibt `index.html` des Builds, nicht 404. `/api/*` bleibt API.
+**Goal:** Reload of `/notes` in production: PHP serves the built `index.html`, not 404. `/api/*` stays the API.
 
-**Fertig wenn:** `npm run build` nach `public/…`, PHP unterscheidet Datei / API / Index.
+**Done when:** `npm run build` into `public/…`, PHP distinguishes file / API / index.
 
 ---
 
-## Welle 5 — DX (erst nach einer handgebauten Page)
+## Wave 5 — DX (only after one handmade page)
 
 ### Phase 5.1 — `make:api`
 
-CLI im PHP-Kern: Model/Controller/Route-Stub für eine Ressource. Templates, die **strict_types** und Namespaces enthalten.
+CLI in the PHP core: model/controller/route stub for a resource. Templates that include **strict_types** and namespaces.
 
-### Phase 5.2 — `make:page` + TanStack-Adapter
+### Phase 5.2 — `make:page` + TanStack adapter
 
-Route-Datei im Frontend-Ordner (ADR-0005/0006). `package.json` erkennt `@tanstack/react-router`.
+Route file in the frontend folder (ADR-0005/0006). `package.json` detects `@tanstack/react-router`.
 
-**Nicht:** Vue-Adapter oder React-Router, bevor dieser Adapter sitzt.
+**Do not:** Vue adapter or React Router before this adapter works.
 
 ---
 
-## Welle 6 — Sessions und Auth
+## Wave 6 — Sessions and auth
 
-### Phase 6.1 — PHP-Sessions (Dateien)
+### Phase 6.1 — PHP sessions (files)
 
-Login-State ohne User-Tabelle testen (z. B. Dummy), Cookie-Flags (`HttpOnly`, `SameSite`, später `Secure`). CSRF-Strategie für Cookie-Auth skizzieren (ADR wenn du wählst: Session-Cookie vs. Token).
+Test login state without a users table (e.g. dummy). Cookie flags (`HttpOnly`, `SameSite`, later `Secure`). Sketch CSRF for cookie auth (ADR when you choose: session cookie vs token).
 
 ### Phase 6.2 — Users in Postgres
 
-Tabelle `users`, Passworthash (`password_hash` / `password_verify`, **kein** MD5). `POST /api/login`, `GET /api/me`, Logout. Writes auf Notes nur eingeloggt.
+Table `users`, password hash (`password_hash` / `password_verify`, **not** MD5). `POST /api/login`, `GET /api/me`, logout. Writes on notes only when logged in.
 
-**Quellen:** [password_hash](https://www.php.net/manual/en/function.password-hash.php) · Session-Sicherheit
+**Sources:** [password_hash](https://www.php.net/manual/en/function.password-hash.php) · session security
 
-**Nicht:** OAuth, Firebase-Auth, CMS-Rollenmodell.
-
----
-
-## Welle 7 — CMS-Flavor (ADR-0009)
-
-Erst wenn 6.2 sitzt.
-
-1. Tabelle `pages` (slug, title, status, `modules` JSONB).  
-2. `GET /api/pages/{slug}` öffentlich.  
-3. Writes nur Auth.  
-4. Eine TanStack-Catch-all-Route + `ModuleRenderer` (ein Block-Typ reicht: z. B. `text`).  
-5. Mini-Admin: Page anlegen, ein Modul setzen.  
-6. Optional `make:block` später.
-
-A11y in **deinen** Blöcken (0010). Kein Sanity.
+**Do not:** OAuth, Firebase Auth, CMS role model.
 
 ---
 
-## Welle 8 — Produkt und Verpackung
+## Wave 7 — CMS flavor (ADR-0009)
 
-- Sitemap + `robots.txt` aus öffentlichen Slugs (0010).  
-- MySQL-Treiber als zweiter PDO-DSN (0007).  
-- Create-Project: Composer-Paket aus *diesem* Gerüst; Init-Menü Compose vs. externe DB (0003/0007).  
-- SSR/Start nur eigener ADR, kein stiller Umbau von 0004.
+Only after 6.2.
+
+1. Table `pages` (slug, title, status, `modules` JSONB).
+2. `GET /api/pages/{slug}` public.
+3. Writes only with auth.
+4. One TanStack catch-all + `ModuleRenderer` (one block type is enough, e.g. `text`).
+5. Mini admin: create a page, set one module.
+6. Optional `make:block` later.
+
+A11y in **your** blocks (0010). No Sanity.
 
 ---
 
-## Empfohlene Reihenfolge der nächsten drei Schritte
+## Wave 8 — Product and packaging
 
-1. Phase 0.1 (Docker + Composer)  
-2. Phase 0.2 (OOP lesen)  
-3. Phase 1.1 (JSON `{"ok":true}` aus dem Front Controller)
+- Sitemap + `robots.txt` from public slugs (0010).
+- MySQL driver as a second PDO DSN (0007).
+- Create-project: Composer package from *this* skeleton; init menu Compose vs external DB (0003/0007).
+- SSR/Start only with its own ADR, no silent rewrite of 0004.
 
-CMS, Scaffold, Auth: nicht in diesen drei.
+---
+
+## Suggested next three steps
+
+1. Phase 0.1 (Docker + Composer)
+2. Phase 0.2 (read OOP)
+3. Phase 1.1 (JSON `{"ok":true}` from the front controller)
+
+CMS, scaffold, auth: not in these three.

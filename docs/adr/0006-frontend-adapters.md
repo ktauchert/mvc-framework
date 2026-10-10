@@ -1,41 +1,41 @@
-# ADR-0006: Frontend-Adapter — Erkennung über package.json
+# ADR-0006: Frontend adapters — detect via package.json
 
 - Status: Accepted
-- Datum: 2026-10-10
+- Date: 2026-10-10
 
-## Kontext
+## Context
 
-ADR-0002 macht die API frontend-agnostisch. ADR-0005 will `make:page` nur für echte Seiten. Es sollen später **mehrere** View-Stacks möglich sein, ohne das PHP-Init (0003) an Vue zu binden.
+ADR-0002 makes the API frontend-agnostic. ADR-0005 wants `make:page` only for real screens. Later **several** view stacks should be possible without binding PHP init (0003) to Vue.
 
-Beispiele: TanStack Router (erster Adapter, ADR-0004), später Vue Router, React Router. Das CLI soll Routen **im jeweiligen System** einrichten können und erkennen, was im Frontend-Ordner wirklich liegt — automatisch oder mit Rückfrage.
+Examples: TanStack Router (first adapter, ADR-0004), later Vue Router, React Router. The CLI should register routes **in that system** and detect what actually lives in the frontend folder — automatically or with a prompt.
 
-Das ist festes Zielbild, nicht nur eine lose Idee. Umsetzung der Adapter **nach** dem ersten von Hand gebauten Frontend, nicht am Tag 1.
+This is a firm target, not a loose idea. Implement adapters **after** the first handmade frontend, not on day one.
 
-## Alternativen
+## Alternatives
 
-1. Ein fest verdrahtetes Vue-Scaffold in Composer — widerspricht 0003 und blockiert React/TanStack.
-2. Konfig-Datei `frontend.stack=vue` pflegen — klar, aber doppelt zu `package.json`.
-3. **Adapter:** `package.json` (dependencies/devDependencies) auslesen; passenden Adapter wählen; bei Unklarheit nachfragen.
+1. A hard-wired Vue scaffold in Composer — contradicts 0003 and blocks React/TanStack.
+2. A config key `frontend.stack=vue` — clear, but duplicates `package.json`.
+3. **Adapters:** read `package.json` (dependencies/devDependencies); pick the matching adapter; ask if unclear.
 
-## Entscheidung
+## Decision
 
-Variante 3. Scaffold-Scripts (`make:page`) sprechen einen **Frontend-Adapter**, nicht Vue direkt.
+Option 3. Scaffold scripts (`make:page`) talk to a **frontend adapter**, not to Vue directly.
 
-Erkennung (Reihenfolge grob): Abhängigkeiten in `frontend/package.json`, z. B.
+Detection (rough order): dependencies in `frontend/package.json`, e.g.
 
-- `@tanstack/react-router` → TanStack-Adapter (Default-Ziel nach 0004)
-- `vue-router` → Vue-Adapter (später)
-- `react-router` / `react-router-dom` → React-Router-Adapter (optional)
+- `@tanstack/react-router` → TanStack adapter (default target after 0004)
+- `vue-router` → Vue adapter (later)
+- `react-router` / `react-router-dom` → React Router adapter (optional)
 
-Ein Treffer: Adapter nutzen (optional kurze Bestätigung). Keiner oder mehrere: nachfragen, nicht raten. Unbekanntes Setup: abbrechen mit Hinweis, Page von Hand.
+One match: use the adapter (optional short confirmation). None or several: ask, do not guess. Unknown setup: abort with a hint to add the page by hand.
 
-Jeder Adapter weiß, wo Page-Dateien liegen und wie eine Route in **diesem** Router registriert wird. PHP-Routen unter `/api` bleiben gleich.
+Each adapter knows where page files live and how a route is registered **in that router**. PHP routes under `/api` stay the same.
 
-Nuxt/Next sind eigene Apps; eigene Adapter nur per späterem ADR.
+Nuxt/Next are their own apps; adapters only via a later ADR.
 
-## Folgen
+## Consequences
 
-- PHP-Kern und Create bleiben stabil, während Views wachsen.
-- `make:api` braucht keinen Adapter; `make:page` schon.
-- Erster Adapter = TanStack Router (0004); Vue danach; kein PHP-Rewrite.
-- Falsch-Positive in `package.json` → deshalb Bestätigung erlaubt.
+- PHP core and create stay stable while views grow.
+- `make:api` needs no adapter; `make:page` does.
+- First adapter = TanStack Router (0004); Vue after that; no PHP rewrite.
+- False positives in `package.json` → confirmation is allowed.

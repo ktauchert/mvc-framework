@@ -1,25 +1,24 @@
-# ADR-0008: Ernstes Framework, selbst gebauter Kern
+# ADR-0008: Serious framework, self-built core
 
 - Status: Accepted
-- Datum: 2026-10-10
+- Date: 2026-10-10
 
-## Kontext
+## Context
 
-„Lernprojekt“ hieß: du baust den Kern selbst, kein fertiger Dump. Das Produktziel ist trotzdem ein **nutzbares, sicheres Framework** für PHP-API plus SPA-Flavors (React/TanStack zuerst, später z. B. Vue) — intuitiv für Entwickler, sicher und flüssig für Endnutzer.
+“Learning project” meant: you build the core yourself, no dumped skeleton. The product goal is still a **usable, secure framework** for a PHP API plus SPA flavors (React/TanStack first, Vue later) — intuitive for developers, safe and smooth for end users.
 
-## Alternativen
+## Alternatives
 
-1. Tutorial-Toy — Patterns zeigen, Sicherheit und DX nachrangig.
-2. Framework-Klon von Laravel in einem Rutsch — du besitzt den Kern nicht.
-3. **Ernstes Design, schrittweise Implementierung** — ADRs und Sicherheit von Anfang an; Create-Project später als Verpackung des gebauten Kerns.
+1. Tutorial toy — show patterns, security and DX secondary.
+2. Clone Laravel in one shot — you do not own the core.
+3. **Serious design, stepwise implementation** — ADRs and security from the start; create-project later as packaging of the built core.
 
-## Entscheidung
+## Decision
 
-Variante 3. Qualitätsmaß: Prepared Statements, bewusste Auth/Session, keine Geheimnisse im Repo, vorhersehbare CLI (0005/0006), SPA die sich schnell anfühlt (kein Extra-Roundtrip ohne Grund).
+Option 3. Quality bar: prepared statements, deliberate auth/session, no secrets in the repo, predictable CLI (0005/0006), an SPA that feels fast (no extra round trip without reason).
 
-„Flavor“ = austauschbare View (0004/0006) plus später austauschbare Persistenz-Adapter (0007), nicht fünf halbe Kerne.
+“Flavor” = swappable view (0004/0006) plus later swappable persistence adapters (0007), not five half cores.
 
-## Folgen
+## Consequences
 
-- SQLite zum Start ist ein *Engine-Default*, kein Spielzeug-Anspruch.
-- Features dürfen warten; unsichere Abkürzungen nicht „weil Lernprojekt“.
+- Default engine is Postgres (0007), not SQLite. Skipping features is fine; insecure shortcuts “because it is a learning build” are not.

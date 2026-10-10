@@ -1,7 +1,7 @@
 # Architecture Decision Records
 
-Ein ADR hält eine Entscheidung fest: Kontext, Alternativen, Wahl, Folgen. Nummer fortlaufend, Datei nicht umbenennen; Status ändern oder durch einen neueren ADR superseeded.
+An ADR records a decision: context, alternatives, choice, consequences. Numbers are sequential. Do not rename files; change status or supersede with a newer ADR.
 
 Status: `Proposed` → `Accepted` | `Rejected` | `Superseded by ADR-XXXX`
 
-Vorlage: [0000-template.md](0000-template.md)
+Template: [0000-template.md](0000-template.md)

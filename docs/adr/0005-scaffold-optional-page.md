@@ -1,40 +1,40 @@
-# ADR-0005: Scaffold — API immer, Page nur auf Wunsch
+# ADR-0005: Scaffold — API always, page only on request
 
 - Status: Accepted
-- Datum: 2026-10-10
+- Date: 2026-10-10
 
-## Kontext
+## Context
 
-Ziel ist **Entwicklungskomfort**, nicht Laufzeit-Kopplung. Wiederkehrendes Anlegen von Controller, Route und ggf. Page soll ein CLI abnehmen; nach dem Generate sind es normale Dateien.
+The goal is **developer experience**, not runtime coupling. Recurring creation of controller, route, and optionally a page should be a CLI job; after generate they are normal files.
 
-Nicht für jede API-Route eine Page (kein 1:1). Nur **Bildschirme** (Login, Liste, Dashboard). Reine Daten-/Aktions-Endpunkte (`GET /api/me`, `POST /api/login`, Nested) bleiben API-only, View von Hand.
+Not a page per API route (no 1:1). Only **screens** (login, list, dashboard). Pure data/action endpoints (`GET /api/me`, `POST /api/login`, nested) stay API-only; the view is handmade.
 
-Hängt an ADR-0002, 0003 und 0006 (Adapter). Welches Frontend zuerst: ADR-0004.
+Depends on ADR-0002, 0003, and 0006 (adapters). Which frontend first: ADR-0004.
 
-## Alternativen
+## Alternatives
 
-1. Kein Generator — alles von Hand (maximaler Lernwert am Anfang).
-2. Jede API-Route erzeugt eine Page — zu viele leere Hüllen, falsches 1:1.
-3. Zwei Befehle bzw. ein Flag: API-Ressource immer; Page nur wenn es eine echte Bildschirm-Route ist.
-4. Inertia: Page-Route *ist* PHP-Route — anderes Modell, hier nicht.
+1. No generator — everything by hand (maximum learning value at the start).
+2. Every API route creates a page — too many empty shells, false 1:1.
+3. Two commands or a flag: API resource always; page only when it is a real screen route.
+4. Inertia: the page route *is* the PHP route — different model, not here.
 
-## Entscheidung
+## Decision
 
-Generator (erst bauen, wenn der Kern von Hand sitzt) unterscheidet:
+The generator (built only after the core exists by hand) distinguishes:
 
-| Befehl (Arbeitstitel) | PHP | Frontend |
+| Command (working title) | PHP | Frontend |
 |---|---|---|
-| `make:api posts` | Controller, Model, `/api/posts` | nichts |
-| `make:page posts` | optional dieselben API-Teile, falls noch fehlen | TanStack: Route-Datei im Routes-Ordner (Konvention `/posts` → Fetch `/api/posts`). Andere Adapter später (0006). |
+| `make:api posts` | Controller, model, `/api/posts` | nothing |
+| `make:page posts` | optionally the same API bits if missing | TanStack: route file in the routes folder (convention `/posts` → fetch `/api/posts`). Other adapters later (0006). |
 
-`make:page` nur für Bildschirme, nicht für `POST /api/login` oder `/api/posts/{id}/comments`. Login-Seite ist eine Page; Login-Submit bleibt API ohne zweite Page.
+`make:page` only for screens, not for `POST /api/login` or `/api/posts/{id}/comments`. The login **screen** is a page; login **submit** stays an API with no second page.
 
-Keine Templates nach `public/`. Page-Dateien und Router-Eintrag schreibt der **aktuelle Frontend-Adapter** (0006), nicht ein hartes Vue-Template.
+No templates under `public/`. Page files and router registration are written by the **current frontend adapter** (0006), not a hard-coded Vue template.
 
-Konvention, keine Laufzeit-Bindung: Name `posts` → URL `/posts` + Fetch `/api/posts`. Weicht die Page davon ab, nach dem Generate von Hand.
+Convention, not a runtime bind: name `posts` → URL `/posts` + fetch `/api/posts`. If the page diverges, edit by hand after generate.
 
-## Folgen
+## Consequences
 
-- Weniger Dateileichen, klarer Unterschied Seite vs. Endpoint.
-- Script muss wissen, welches Frontend (0004) und dass Pages ≠ HTTP-Methoden.
-- Erst sinnvoll, wenn du Routing und eine Page einmal ohne Generator gebaut hast.
+- Fewer leftover files; clear split between screen and endpoint.
+- The script must know which frontend (0004) and that pages ≠ HTTP methods.
+- Only worth it after you have built routing and one page without the generator.

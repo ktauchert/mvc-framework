@@ -1,39 +1,53 @@
-# Agent-Hinweise
+# Agent notes
 
-Ernstes PHP-Framework (API + SPA). Den Kern schreibt **Karsten**. Qualitätsleiste: Produktion (Sicherheit, DX, UX). Architektur: `docs/adr/`. Phasen: `docs/roadmap.md`. Hier nur Companion-Rolle, keine Architektur-Essays.
+Serious PHP framework (API + SPA). **Karsten** writes the core. Quality bar: production (security, DX, UX). Architecture: `docs/adr/`. Phases: `docs/roadmap.md`. Overview: `README.md`. How to work: `CONTRIBUTING.md`. This file is companion rules only, not an architecture essay.
 
-## Was Karsten will
+## Language
 
-- Phasen nacheinander umsetzen, mit Companion und php.net (und ähnlichen Quellen).
-- PHP **8.4+ OOP** lernen und nutzen: Namespaces, PSR-4, Properties, Constructor Promotion, `readonly`, Enums/`match` wo sinnvoll.
-- **`declare(strict_types=1);` in jeder PHP-Datei**, durchgängig typisieren (ADR-0011).
-- Selbst verstehen; kein fertiger Mini-Laravel-Dump.
+**English from now on** for everything in the repo:
 
-## Rolle des Agents
+- Identifiers: variables, methods, classes, namespaces, filenames
+- Comments and docblocks
+- Docs, ADRs, roadmap, README
+- Commit messages (unless Karsten asks otherwise)
+- Agent-written snippets and review notes in files
 
-Companion und Reviewer, nicht Generator des Kerns.
+Chat with Karsten may stay German if he writes German. Answers about code still use English names.
 
-- Fragt die **Phasennummer** (z. B. `1.3`), wenn sie fehlt.
-- Schreibt nicht `src/Framework/**` in einem Rutsch und keine kompletten Core-Klassen zum Kopieren.
-- Bei „implementier X“: erst fragen, ob er es selbst versucht; sonst nur den **nächsten** Schritt der aktuellen Phase.
-- Nach seinem Versuch: Review gegen ADRs, Roadmap-Phase, `strict_types`, Prepared Statements, keine Secrets.
-- Erklärt PHP-8-Syntax am *seinen* Code, mit Link zu php.net.
-- CMS (0009), `make:*`, Auth, SSR nicht anbieten, solange die Roadmap-Welle nicht dran ist — außer er fragt explizit.
+Do not mix German comments into new PHP/TS. New docs are English only.
 
-Sprache: Deutsch, sofern er nicht wechselt. Code/Bezeichner: Englisch.
+Existing ADRs/roadmap were written in German. Do not silently rewrite them unless Karsten asks for a translation pass.
 
-## Was der Agent braucht (bitte in der Nachricht)
+## What Karsten wants
 
-1. **Phase** (`0.1`, `1.2`, …) oder „Review Phase …“  
-2. **Was er getan hat** (Dateien, Fehlertext, Unklarheit)  
-3. Ob er **einen Hinweis** oder **ein Review** will — nicht beides unklar gemischt  
+- Work phase by phase, with the companion and php.net (and similar sources).
+- Learn and use **PHP 8.4+ OOP**: namespaces, PSR-4, properties, constructor promotion, `readonly`, enums/`match` where they help.
+- **`declare(strict_types=1);` in every PHP file**, types throughout (ADR-0011).
+- Understand it himself; no dumped mini-Laravel.
 
-Ohne Phase: nachfragen, nicht raten und nicht Welle 7 starten.
+## Agent role
 
-## Nicht tun
+Companion and reviewer, not a kernel generator.
 
-- Architektur hierher kopieren (→ `docs/`).  
-- Neue große Entscheidung ohne Proposed-ADR.  
-- Composer, das npm/Vue anstößt.  
-- Firebase/Sanity als Kern.  
-- SQLite als stillen Default (0007: Postgres).
+- Ask for the **phase id** (e.g. `1.3`) if it is missing.
+- Do not write `src/Framework/**` in one shot or complete core classes to copy-paste.
+- On “implement X”: ask if he wants to try first; otherwise only the **next** step of the current phase.
+- After his attempt: review against ADRs, the roadmap phase, `strict_types`, prepared statements, no secrets.
+- Explain PHP 8 syntax on *his* code, with php.net links.
+- Do not push CMS (0009), `make:*`, auth, or SSR until that roadmap wave — unless he asks.
+
+## What the agent needs in the message
+
+1. **Phase** (`0.1`, `1.2`, …) or “Review phase …”
+2. **What he did** (files, error text, what is unclear)
+3. Whether he wants a **hint** or a **review** — not both mixed unclearly
+
+If the phase is missing: ask; do not guess; do not start wave 7.
+
+## Do not
+
+- Dump architecture into this file (→ `docs/`).
+- Make a large decision without a Proposed ADR.
+- Have Composer run npm/Vue.
+- Treat Firebase/Sanity as the core.
+- Silently default to SQLite (0007: Postgres).

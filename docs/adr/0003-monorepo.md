@@ -1,29 +1,29 @@
-# ADR-0003: Ein Repository, getrennte Inits (Composer und npm)
+# ADR-0003: One repository, separate inits (Composer and npm)
 
 - Status: Accepted
-- Datum: 2026-10-10
+- Date: 2026-10-10
 
-## Kontext
+## Context
 
-Ein Clone soll das Grundgerüst enthalten (wie nach `laravel new` / `symfony new` / `create-next-app`), aber hier sind zwei Ökosysteme im Spiel. Composer soll **nicht** implizit Vue/React anlegen — sonst klebt das PHP-Init am ersten Frontend und verbirgt den Schnitt aus ADR-0002.
+A clone should contain the skeleton (like after `laravel new` / `symfony new` / `create-next-app`), but two ecosystems are in play. Composer must **not** implicitly scaffold Vue/React — that would glue PHP init to the first UI kit and hide the cut from ADR-0002.
 
-## Alternativen
+## Alternatives
 
-1. Zwei Repos — früher Overhead, widerspricht „ein Pull“.
-2. Ein Repo, **ein** Super-Init das Composer und `npm create vue` hintereinander ausführt — bequem, koppelt das Framework an ein UI-Toolkit.
-3. Ein Repo, **zwei** Inits: PHP-Skeleton via Composer (oder eigenes `create`-Kommando); Frontend via npm/Vite im Frontend-Ordner, getrennt und bewusst.
+1. Two repos — early overhead, contradicts “one pull”.
+2. One repo, **one** super-init that runs Composer then `npm create vue` — convenient, couples the framework to one UI toolkit.
+3. One repo, **two** inits: PHP skeleton via Composer (or a `create` command); frontend via npm/Vite in the frontend folder, separate on purpose.
 
-## Entscheidung
+## Decision
 
-Variante 3. Ein Repository. PHP-Init und Node-Init bleiben getrennt.
+Option 3. One repository. PHP init and Node init stay separate.
 
-- PHP: `composer install` / später `create-project` (oder CLI `new`) erzeugt nur den PHP-Kern.
-- Frontend: `npm create` / `npm install` im Frontend-Ordner, wenn die View an der Reihe ist.
-- Composer führt kein `npm` und kein Vue/React-Scaffold aus.
-- Lokal zwei Dev-Prozesse; Produktion: PHP-Document-Root plus gebautes Bundle in `public/`.
+- PHP: `composer install` / later `create-project` (or CLI `new`) creates only the PHP core.
+- Frontend: `npm create` / `npm install` in the frontend folder when the view is due.
+- Composer does not run `npm` or Vue/React scaffolding.
+- Locally two dev processes; production: PHP document root plus the built bundle in `public/`.
 
-Ordnernamen konkretisieren, wenn die erste Schicht gebaut wird. Frontend-Erkennung und Page-Scaffold: ADR-0006.
+Concrete folder names when the first layer is built. Frontend detection and page scaffold: ADR-0006.
 
-## Folgen
+## Consequences
 
-Ein Clone reicht fürs Repo; zum Laufen braucht es zwei Installer. Erstes Frontend (0004) ist unabhängig vom PHP-Create. Später weitere Frontends ohne PHP-Init umzubauen.
+One clone is enough for the repo; running it needs two installers. The first frontend (0004) is independent of PHP create. Later frontends do not require rewriting PHP init.

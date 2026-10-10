@@ -1,21 +1,21 @@
-# ADR-XXXX: Titel
+# ADR-XXXX: Title
 
 - Status: Proposed
-- Datum: YYYY-MM-DD
+- Date: YYYY-MM-DD
 
-## Kontext
+## Context
 
-Welches Problem? Welche Zwänge (Lernziel, Zeit, Betrieb)?
+What problem? What constraints (learning, time, operations)?
 
-## Alternativen
+## Alternatives
 
 1. …
 2. …
 
-## Entscheidung
+## Decision
 
-Was gilt, sobald der Status Accepted ist.
+What holds once status is Accepted.
 
-## Folgen
+## Consequences
 
-Was wird einfacher, was schwerer, was bewusst nicht getan wird.
+What gets easier, what gets harder, what we deliberately will not do.

@@ -1,36 +1,36 @@
-# ADR-0004: Welches Frontend zuerst?
+# ADR-0004: Which frontend first?
 
 - Status: Accepted
-- Datum: 2026-10-10
+- Date: 2026-10-10
 
-## Kontext
+## Context
 
-PHP ist entschieden (API, JSON, getrenntes Init). Hier nur die **erste** View: von Hand lernen, danach erster `make:page`-Adapter (0006). Weitere Stacks (inkl. Vue) bleiben erlaubt.
+PHP is decided (API, JSON, separate init). This is only the **first** view: learn it by hand, then the first `make:page` adapter (0006). Other stacks (including Vue) stay allowed.
 
-React ist bekanntes Wasser; Vue soll später trotzdem mal drankommen — als zweiter Adapter, nicht als Start.
+React is familiar water; Vue should still happen later — as a second adapter, not as the start.
 
-## Was diese Entscheidung nicht ist
+## What this decision is not
 
-- Nicht PHP-Architektur (0002).
-- Nicht „nur React für immer“ (0006).
-- Nicht Composer installiert das Frontend (0003).
+- Not PHP architecture (0002).
+- Not “React forever” (0006).
+- Not Composer installing the frontend (0003).
 
-## Alternativen
+## Alternatives
 
-1. Vue 3 + Vite + Vue-Router
-2. React + Vite + React-Router
-3. Nuxt oder Next zuerst (zu schwer, nicht Start)
-4. **React + Vite + TanStack Router** (file-based Routes: neue Seite = Datei im Routes-Ordner)
+1. Vue 3 + Vite + Vue Router
+2. React + Vite + React Router
+3. Nuxt or Next first (too heavy, not the start)
+4. **React + Vite + TanStack Router** (file-based routes: a new page is a file in the routes folder)
 
-## Entscheidung
+## Decision
 
-**Variante 4.** Erstes Frontend: React mit Vite und **TanStack Router**, als **SPA** gegen die PHP-API. TanStack Start (SSR) bewusst nicht der erste Wurf; Router *kann* später SSR, siehe ADR-0010.
+**Option 4.** First frontend: React with Vite and **TanStack Router**, as an **SPA** against the PHP API. TanStack Start (SSR) is deliberately not the first pass; the router *can* SSR later, see ADR-0010.
 
-`make:page` schreibt vor allem eine Datei in den Routes-Ordner; der Router pickt sie über Konvention auf. Vue-Bekanntschaft: später eigener Adapter.
+`make:page` mainly writes a file into the routes folder; the router picks it up by convention. Meeting Vue: a later adapter.
 
-## Folgen
+## Consequences
 
-- Erster 0006-Adapter = TanStack Router (React).
-- `make:page posts` ≈ Route-Datei anlegen, kein zentrales `routes.ts` patchen.
-- PHP `/api` unverändert.
-- Vue bleibt Lernziel Nr. 2, nicht blockiert.
+- First 0006 adapter = TanStack Router (React).
+- `make:page posts` ≈ add a route file, no central `routes.ts` patch.
+- PHP `/api` unchanged.
+- Vue remains learning goal #2, not blocked.
