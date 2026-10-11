@@ -1,0 +1,17 @@
+/vendor/
+.env
+/node_modules/
+/.obsidian/
+
+# later frontend build
+/public/build/
+/frontend/dist/
+
+# PHP / IDE
+.phpunit.cache
+.phpunit.result.cache
+/storage/*.log
+.idea/
+.vscode/
+*.swp
+.DS_Store

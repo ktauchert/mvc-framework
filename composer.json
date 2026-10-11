@@ -1,0 +1,22 @@
+{
+    "name": "ktauchert/mvc-framework",
+    "description": "PHP JSON API with a swappable SPA view",
+    "type": "project",
+    "require": {
+        "php": ">=8.4",
+        "ext-pdo": "*",
+        "ext-pdo_pgsql": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Framework\\": "src/Framework/",
+            "App\\": "app/"
+        }
+    },
+    "scripts": {
+        "serve": "php -S localhost:8000 -t public public/router.php"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

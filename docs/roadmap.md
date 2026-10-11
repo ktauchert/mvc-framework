@@ -24,7 +24,7 @@ frontend/               from wave 4 (React + TanStack)
 
 **Goal:** PHP 8.4+, Composer, Git, Docker. Postgres container starts; PHP may run **on the host** first (`php -S`) if `pdo_pgsql` is present.
 
-**PHP focus:** Check version (`php -v`, `php -m` includes `pdo_pgsql`). No OOP requirement yet.
+**PHP focus:** Check version (`php -v`, `php -m` includes `pdo_pgsql`). No OOP requirement yet. If the module is missing: install the distro package (Ubuntu: `php8.5-pgsql` / `php-pgsql`). Later init only **detects** and prints the command (ADR-0007), it does not `sudo apt` by itself.
 
 **You:** Git init if needed. `.gitignore` (`/vendor`, `.env`, `node_modules`, IDE, `.obsidian`). `.env.example` with Postgres placeholders. `docker-compose.yml` for Postgres only, credentials from `.env`. `composer.json` with PSR-4 `Framework\\` → `src/Framework/`, `App\\` → `app/`, script `serve` → `php -S localhost:8000 -t public public/router.php` (router file in 1.1).
 

@@ -27,6 +27,7 @@ Option 3. **First and default: dockerized PostgreSQL.**
 - MySQL/MariaDB and SQLite: later the same persistence port, different DSN; init menu only once that driver is supported.
 - Sessions stay PHP files first; auth `users` in Postgres.
 - **Init (later, create-project):** choose e.g. “Compose with Postgres”, “I already have Postgres”, “I already have MySQL”. Composer still does not install npm (0003).
+- **Extension check:** init/`doctor` must verify `extension_loaded('pdo_pgsql')` (later `pdo_mysql`). On failure: print the distro command (`php8.5-pgsql` on Ubuntu, etc.) and abort. Do **not** run `apt`/`dnf` as root from Composer. Optional: ask “run this install command?” only with explicit yes. If PHP later runs **in** Docker, bake `pdo_pgsql` into that image instead of the host.
 
 Mongo/Firebase/Supabase JS: still not the core. Supabase Postgres would be the “existing Postgres URL” case.
 
