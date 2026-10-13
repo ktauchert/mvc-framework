@@ -1,22 +1,28 @@
 {
-    "name": "ktauchert/mvc-framework",
-    "description": "PHP JSON API with a swappable SPA view",
-    "type": "project",
-    "require": {
-        "php": ">=8.4",
-        "ext-pdo": "*",
-        "ext-pdo_pgsql": "*"
+  "name": "ktauchert/mvc-framework",
+  "description": "PHP JSON API with a swappable SPA view",
+  "type": "project",
+  "require": {
+    "php": ">=8.4",
+    "ext-pdo": "*",
+    "ext-pdo_pgsql": "*",
+    "vlucas/phpdotenv": "^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Framework\\": "Framework/",
+      "App\\": "src/app/",
+      "Api\\": "src/api/"
     },
-    "autoload": {
-        "psr-4": {
-            "Framework\\": "src/Framework/",
-            "App\\": "app/"
-        }
-    },
-    "scripts": {
-        "serve": "php -S localhost:8000 -t public public/router.php"
-    },
-    "config": {
-        "sort-packages": true
-    }
+    "files": [
+      "Framework/helpers/autoload.php"
+    ]
+  },
+  "scripts": {
+    "serve": "php -S localhost:8000 -t public public/router.php",
+    "make-route": "php scripts/make-route.php"
+  },
+  "config": {
+    "sort-packages": true
+  }
 }
