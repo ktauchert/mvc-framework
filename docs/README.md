@@ -11,7 +11,7 @@ PHP MVC, file-based routing, PHP views (ADR-0012). Core built step by step.
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | How to work in this repo |
 | [../AGENTS.md](../AGENTS.md) | Companion rules |
 
-**Accepted (current):** 0001, 0003 (amended), 0007, 0008, 0009, 0010, 0011, **0012**.
+**Accepted (current):** 0001, 0003 (amended), 0007, 0008, 0009, 0010, 0011, **0012**, **0013**.
 
 **Superseded:** 0002, 0004, 0005, 0006 (SPA / JS adapters) — kept as history.
 

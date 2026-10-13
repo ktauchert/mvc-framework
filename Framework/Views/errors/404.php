@@ -1,3 +1,6 @@
+<?php
+/** @var string $message Set in catchException() via require (same scope). */
+?>
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -14,7 +17,7 @@
 </head>
 <body>
     <div class="error-container">
-        <h1>404</h1 w>
+        <h1>404</h1>
         <p>Die von dir aufgerufene Seite konnte leider nicht gefunden werden.</p>
         <code><?php echo $message; ?></code>
         <a href="/">Zur Startseite</a>

@@ -1,3 +1,7 @@
+<?php
+/** @var bool $debug */
+/** @var Throwable $exception Both set in catchException() via require (same scope). */
+?>
 <!DOCTYPE html>
 <html lang="de">
 <head>

@@ -51,13 +51,13 @@ scripts/make-route.php         composer make-route
 
 ### Phase 1.3 — Base Controller, render, layouts
 
-**Goal:** Next.js shape in PHP: `IndexClass extends Controller`. `render($view, $data)` fills a view and wraps a layout. Views live next to the route or under `Framework/Views` — pick one convention and stick to it.
+**Goal:** ADR-0013: `IndexClass extends Controller`. `render($view, $data)` buffers `src/views/{view}.php` into `$content` and requires `src/views/layouts/main.php`. Title via `$data['title']`. Use `require`, not `require_once`.
 
-**PHP focus:** inheritance, `protected` helpers, `extract` is easy but easy to abuse; prefer explicit view params.
+**PHP focus:** inheritance, output buffering, careful `extract` (`EXTR_SKIP`).
 
 **Done when:** `/test` is a view + layout, not `echo "<h1>"`. Home `/` has `src/app/IndexClass.php` if you want `/` to work.
 
-**Do not:** Vue. Tailwind optional after this, not instead of it.
+**Do not:** Vue. Do not build `component()` / Table TS yet (same ADR, later). Tailwind optional after HTML works.
 
 ### Phase 1.4 — Align namespace, autoload, and folders
 
@@ -97,9 +97,9 @@ PHPUnit (or Pest) against dispatch without the browser. One 404, one `/test` or 
 
 ---
 
-## Wave 4 — DX and CSS
+## Wave 4 — DX, components, CSS
 
-Harden `make-route`. Optional Tailwind: scan `*.php`, output CSS under `public/` — still PHP HTML.
+Harden `make-route`. `component()` helper (ADR-0013). Static PHP components first. Table + HTML-fragment endpoints after wave 2. Optional Vite/Tailwind for `*.ts` / `*.php` → `public/build/` — still PHP HTML, not a SPA.
 
 **Do not:** `frontend/` Vue/React app.
 
