@@ -7,7 +7,7 @@
 
 The target includes **company marketing sites**: create and fill a page quickly, without a deploy. Reference: [fahrschule-rookie](https://github.com/ktauchert/fahrschule-rookie) — Next.js + Sanity, **page builder**: the developer defines modules (Hero, Teaser, Locations), Studio offers them as choices, a page is a list `{ type, …fields }`, `ModuleRenderer` maps `type` to React components.
 
-The same construct here: PHP API + Postgres instead of Sanity, admin SPA instead of Studio, public TanStack SPA instead of Next `[slug]`. React blocks first (0004); Vue blocks later as a frontend adapter (0006).
+The same construct here (amended by ADR-0012): PHP + Postgres instead of Sanity, PHP admin views instead of Studio, public pages as file-based `IndexClass` routes instead of Next `[slug]`. Blocks are PHP partials (or later a registry), not Vue/React components.
 
 This is **not** a kernel feature on day one. It is a **flavor/module on top of the core**. Without a prior decision, retrofitting is expensive (no JSONB, no slug pages, writes without auth, one controller per marketing page).
 
@@ -16,11 +16,11 @@ This is **not** a kernel feature on day one. It is a **flavor/module on top of t
 | Sanity / driving school | Here |
 |---|---|
 | Schema (`heroCtaModule`) | Block type: name + field list (validation in PHP) |
-| Studio | Admin SPA, auth, `POST/PATCH /api/pages` |
-| GROQ + dataset | `GET /api/pages/{slug}` from Postgres |
+| Studio | PHP admin UI, auth, write routes |
+| GROQ + dataset | Load page by slug from Postgres |
 | `modules[]` | JSONB array `[{ "type": "hero", "headline": "…" }, …]` |
-| `ModuleRenderer` | React map `type` → component |
-| `app/[slug]` | TanStack route `/$slug` (CMS pages), not every app route |
+| `ModuleRenderer` | PHP map `type` → view partial |
+| `app/[slug]` | File route and/or dynamic `IndexClass` (CMS pages) |
 
 The developer writes components **and** registers the block type. Editors pick only registered types — not a free-HTML CMS.
 
@@ -47,8 +47,8 @@ Option 4.
 - Table `pages` (slug, title, status, `modules` JSONB, timestamps).
 - Block registry (allowed `type`s + schema); API rejects unknown types.
 - Admin UI: create a page, pick/fill/sort blocks.
-- Public SPA: renderer like the driving-school site. Sitemap/robots: ADR-0010.
-- Optional `make:block hero` creates a React component + registry entry (DX, 0005/0006).
+- Public PHP `render()` + layout. Sitemap/robots: ADR-0010.
+- Optional `make:block` later: PHP partial + registry (DX).
 
 Login stays code. Not every page is a builder document.
 
@@ -56,4 +56,4 @@ Login stays code. Not every page is a builder document.
 
 - The company-site product is a flavor; create-project can offer it later.
 - Retrofit = module + JSONB + one catch-all route, not a second routing model.
-- Vue components as admin choices = second frontend adapter, same JSON contract.
+- Admin “block picker” lists registered PHP partials, not Vue SFCs.

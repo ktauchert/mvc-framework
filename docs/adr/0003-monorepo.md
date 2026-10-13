@@ -15,15 +15,12 @@ A clone should contain the skeleton (like after `laravel new` / `symfony new` / 
 
 ## Decision
 
-Option 3. One repository. PHP init and Node init stay separate.
+Option 3 was “two inits (Composer + npm)”. **Amended by [ADR-0012](0012-php-mvc-file-routing.md):** one repository, **Composer only** for the app. Views are PHP. No required `frontend/` or `npm` init.
 
-- PHP: `composer install` / later `create-project` (or CLI `new`) creates only the PHP core.
-- Frontend: `npm create` / `npm install` in the frontend folder when the view is due.
+- PHP: `composer install` / later `create-project` creates the PHP core.
 - Composer does not run `npm` or Vue/React scaffolding.
-- Locally two dev processes; production: PHP document root plus the built bundle in `public/`.
-
-Concrete folder names when the first layer is built. Frontend detection and page scaffold: ADR-0006.
+- Locally: `composer serve` + Docker Postgres. Optional Tailwind CLI later is CSS tooling, not a second UI framework.
 
 ## Consequences
 
-One clone is enough for the repo; running it needs two installers. The first frontend (0004) is independent of PHP create. Later frontends do not require rewriting PHP init.
+One clone + `composer install` is enough to run the app (plus Docker for Postgres). A JS SPA would need a new ADR.

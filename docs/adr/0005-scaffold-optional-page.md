@@ -1,6 +1,6 @@
 # ADR-0005: Scaffold — API always, page only on request
 
-- Status: Accepted
+- Status: Superseded by [ADR-0012](0012-php-mvc-file-routing.md)
 - Date: 2026-10-10
 
 ## Context

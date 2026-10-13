@@ -5,7 +5,7 @@
 
 ## Context
 
-“Learning project” meant: you build the core yourself, no dumped skeleton. The product goal is still a **usable, secure framework** for a PHP API plus SPA flavors (React/TanStack first, Vue later) — intuitive for developers, safe and smooth for end users.
+“Learning project” meant: you build the core yourself, no dumped skeleton. The product goal is still a **usable, secure framework**. The view is PHP (ADR-0012), not a JS SPA. JSON under `src/api/` can exist later. Intuitive for developers, safe and smooth for end users.
 
 ## Alternatives
 
@@ -15,9 +15,9 @@
 
 ## Decision
 
-Option 3. Quality bar: prepared statements, deliberate auth/session, no secrets in the repo, predictable CLI (0005/0006), an SPA that feels fast (no extra round trip without reason).
+Option 3. Quality bar: prepared statements, deliberate auth/session, no secrets in the repo, predictable CLI (`make-route` and later commands), HTML pages that feel fast.
 
-“Flavor” = swappable view (0004/0006) plus later swappable persistence adapters (0007), not five half cores.
+“Flavor” = later extras (CMS, API) on the same PHP kernel, plus persistence adapters (0007) — not a second frontend framework.
 
 ## Consequences
 

@@ -1,28 +1,44 @@
 # MVC Framework
 
-A PHP JSON API with a swappable SPA view. You build the **core yourself**; this repo holds architecture, the roadmap, and (later) the skeleton.
+A **PHP-only MVC** (ADR-0012). You own the core. Views are PHP HTML, not Vue or React. Routing is **file-based**, Next.js-shaped: a folder under `src/app/` is a URL.
 
-- **PHP ≥ 8.4**, `declare(strict_types=1);` in every PHP file
-- **PostgreSQL** via PDO (`pdo_pgsql`), Docker Compose locally
-- **View:** React + Vite + TanStack Router (SPA); Vue later via adapters
-- **Not** Laravel, Inertia, or a CMS on day one — those are documented as later flavors
+- **PHP ≥ 8.4**, `declare(strict_types=1);` in every PHP file (ADR-0011)
+- **PostgreSQL** via PDO, Docker Compose (ADR-0007)
+- **View:** PHP templates, layouts, and `render()` (base `Controller` still to add)
+- **Not** Vue/Nuxt/Inertia as the page layer. JSON may live under `src/api/` later.
+
+## How a request runs (today)
+
+`composer serve` → `php -S … -t public public/router.php`
+
+1. `public/router.php` takes the URL path.
+2. `/test` → file `src/app/test/IndexClass.php`, class `App\Controllers\Test\IndexClass`.
+3. `/` → `src/app/IndexClass.php` (home; add this file when you want `/`).
+4. `run()` executes (today: `echo` HTML). Errors use `Framework/Views/errors/`.
+
+```
+GET /test
+  → public/router.php
+  → src/app/test/IndexClass.php
+  → IndexClass::run()
+```
+
+Scaffold: `composer make-route test`.
 
 ## Status
 
-Architecture is **accepted** (ADR-0001–0011). Implementation follows [docs/roadmap.md](docs/roadmap.md). There is no runnable kernel yet. Next work: **phase 0.1**.
+ADR-0012 is the view/routing decision. Kernel exists in sketch form (dispatcher, config, dotenv, error views, one `/test` route). Next: base `Controller`, `render()`, layouts — see [docs/roadmap.md](docs/roadmap.md).
 
 ## Docs
 
 | Doc | What |
 |---|---|
-| [docs/roadmap.md](docs/roadmap.md) | Phases and learning focus |
-| [docs/adr/](docs/adr/) | Architecture decisions |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute / work phases |
-| [AGENTS.md](AGENTS.md) | Rules for the coding agent |
+| [docs/roadmap.md](docs/roadmap.md) | Phases |
+| [docs/adr/](docs/adr/) | Decisions (0012 supersedes SPA/Vue ADRs) |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to work |
+| [AGENTS.md](AGENTS.md) | Companion rules |
 
-## Later install (not yet)
-
-When the skeleton exists:
+## Run
 
 ```bash
 composer install
@@ -31,12 +47,8 @@ docker compose up -d
 composer serve
 ```
 
-Frontend (own init, not Composer):
-
-```bash
-cd frontend && npm install && npm run dev
-```
+Open `http://localhost:8000/test`.
 
 ## License
 
-Not chosen yet. Add a `LICENSE` file when you publish the package.
+Not chosen yet.
