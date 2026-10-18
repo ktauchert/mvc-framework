@@ -1,42 +1,35 @@
 <?php
 
+/**
+ * Entry point for the application.
+ * This script captures the incoming HTTP request, resolves the appropriate controller,
+ * and executes the controller's run method to handle the request.
+ */
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$baseAppPath = config('dir.app');
-
 try {
-    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-    $path = is_string($path) ? rtrim($path, '/') : '';
+    $request = Framework\Http\Request::capture();
+    $resolver = new Framework\Core\Resolver();
 
-    if ($path === '/' || $path === '') {
-        $file = $baseAppPath . '/IndexClass.php';
-        $className = 'App\\Controllers\\IndexClass';
+    $path = $request->getPath();
+    $className = $resolver->resolveRouteToClass($path);
+
+    if (!$className || !class_exists($className)) {
+        throw new Exception("Controller class '$className' not found.", 404);
     } else {
-        $file = $baseAppPath . $path . '/IndexClass.php';
-
-        $segments = explode('/', trim($path, '/'));
-        $segments = array_map('ucfirst', $segments);
-        $className = 'App\\Controllers\\' . implode('\\', $segments) . '\\IndexClass';
-    }
-
-    if (file_exists($file)) {
-        require_once $file;
-
-        if (class_exists($className)) {
-            $controller = new $className();
-            if (method_exists($controller, 'run')) {
-                $controller->run();
-            } else {
-                throwException("Method 'run' not found in class '$className'", 500);
-            }
-        } else {
-            throwException("Class '$className' not found in file '$file'", 500);
+        $controller = new $className($request);
+        if (!method_exists($controller, 'run')) {
+            throw new Exception("Method 'run' not found in controller '$className'.", 404);
         }
-    } else {
-        throwException("The path '$path' is not known, please return to the Homepage.", 404);
+        $controller->run();
+        $controller->send();
+
     }
+
+
 } catch (Throwable $e) {
     catchException($e, $e->getCode() ?: 500);
 }

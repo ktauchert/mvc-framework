@@ -32,7 +32,7 @@ if (!function_exists('throwException')) {
 }
 
 if (!function_exists('catchException')) {
-    function catchException(Throwable $e, int $http_response_code = 500)
+    function catchException(Throwable $e, int $http_response_code = 500, ?Framework\Http\Response $response = null)
     {
         http_response_code($http_response_code);
 
