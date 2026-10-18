@@ -1,9 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers\Test;
 
-class IndexClass {
-    public function run() {
-        echo "<h1>Route: /test</h1>";
+use Framework\Core\Controller;
+
+class IndexClass extends Controller
+{
+    public function run(): void
+    {
+        $this->render('test.index', ['message' => 'Hello from Test IndexClass!']);
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "ktauchert/mvc-framework",
-  "description": "PHP JSON API with a swappable SPA view",
+  "description": "PHP MVC with file-based routes and PHP views",
   "type": "project",
   "require": {
     "php": ">=8.4",
@@ -11,9 +11,11 @@
   "autoload": {
     "psr-4": {
       "Framework\\": "Framework/",
-      "App\\": "src/app/",
       "Api\\": "src/api/"
     },
+    "classmap": [
+      "src/app/"
+    ],
     "files": [
       "Framework/helpers/autoload.php"
     ]
