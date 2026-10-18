@@ -1,0 +1,5 @@
+// Entry for Dart Sass (ADR-0015). Thematic partials: @use 'theme';
+// Output: public/css/app.css via `composer assets`.
+
+
+@use 'main/page';

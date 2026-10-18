@@ -22,7 +22,9 @@
   },
   "scripts": {
     "serve": "php -S localhost:8000 -t public public/router.php",
-    "make-route": "php scripts/make-route.php"
+    "make-route": "php scripts/make-route.php",
+    "assets": "sass src/styles/app.scss public/css/app.css",
+    "assets:watch": "sass --watch src/styles/app.scss public/css/app.css"
   },
   "config": {
     "sort-packages": true
