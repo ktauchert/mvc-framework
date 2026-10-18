@@ -3,6 +3,7 @@
 - Status: Accepted
 - Date: 2026-10-13
 - Depends on: ADR-0012 (PHP views, file-based routes), ADR-0010 (meta/a11y)
+- Amended by: [ADR-0016](0016-pagebuilder-layout-meta.md) (PageBuilder, `src/layout/`, MetaInfo, dotted views)
 
 ## Context
 
@@ -24,17 +25,20 @@ The other-chat sketches used `extract()` + `ob_start` + `require_once`. The layo
 
 ### 1. Layout + view (phase 1.3)
 
-- Default layout: `src/views/layouts/main.php` — once: doctype, `<head>`, header, `<main><?= $content ?></main>`, footer, script/style tags.
-- Page views: `src/views/{name}.php` — **only** inner HTML for `<main>` (no second document).
-- `Framework\Core\Controller::render(string $view, array $data = [])`:
+**Current files and assembly:** [ADR-0016](0016-pagebuilder-layout-meta.md) (`src/layout/page.php`, partials, `PageBuilder`, `MetaInfo`, dotted view names). The bullets below were the first sketch (one `main.php` under `src/views/layouts/`). HTML rules in this ADR still apply.
+
+- Default layout: document shell + header/footer (ADR-0016), not a second HTML document in the view.
+- Page views: **only** inner HTML for `<main>`.
+- `Framework\Core\Controller::render(string $view, array $data = []): void` (HTTP contract: ADR-0014):
   1. Buffer the view (`ob_start` / `ob_get_clean`) → `$content`.
-  2. Require the layout (same request). Layout sees `$content` plus page data (`$title`, later `$meta`).
+  2. PageBuilder requires the shell (same request). Layout sees `$content` plus MetaInfo (title, css, js). `$data` is view locals, not `<head>`.
+  3. Write the finished HTML onto the Controller’s inner Response (`setBody`). Do not return a Response; glue calls `send()` after `run()`.
 - Use **`require`**, not `require_once`, for views, layouts, and components. `require_once` skips a second include of the same file (two Buttons on one page would break).
 - Prefer not to `extract()` blindly; if used, `EXTR_SKIP` and never pass a prop named `content` (clashes with the slot).
-- **Title / meta:** `$data['title']` in `<title>`. Later `$data['meta']` (description, canonical, JSON-LD) in `<head>` without a new layout file per page.
-- **Theme / other layouts:** `render($view, $data, $layout = 'main')` later (e.g. `admin`, `auth`) or a theme prefix. Not required for the first layout.
+- **Title / meta:** `MetaInfo` (ADR-0016) into `<title>` and `<head>`. Later fields (canonical, JSON-LD) stay on that object, not a new layout file per page.
+- **Theme / other layouts:** extra shells (`admin`, `auth`) later. Not required for the first layout.
 
-File-based `IndexClass::run()` calls `$this->render(...)`. Error views may keep a dedicated layout or the same `main` later.
+File-based `IndexClass::run(): void` calls `$this->render(...)` (ADR-0014). Error views may keep a dedicated layout or the same `main` later.
 
 ### 2. Components (after `render()` works)
 
@@ -53,4 +57,4 @@ Do not implement `component()` or Table-TS before phase **1.3** (layout + `rende
 
 - One HTML shell, pages stay small, SEO/meta have a single `<head>` (0010).
 - Components compose inside views; views compose into the layout.
-- Implementation order: 1.1 front controller → 1.3 `Controller::render` + `main` layout → `component()` helper → static components → Table + fragment endpoint after wave 2 → Vite when TS is needed.
+- Implementation order: 1.1 front controller → 1.2 Request/Response + 1.3 `render` / PageBuilder (built together) → `component()` helper → static components → Table + fragment endpoint after wave 2 → Vite when TS is needed.

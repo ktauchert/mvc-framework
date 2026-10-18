@@ -1,6 +1,8 @@
 # Agent notes
 
-Serious PHP MVC. **Karsten** writes the core. Quality bar: production (security, DX, UX). Architecture: `docs/adr/`. Phases: `docs/roadmap.md`. Overview: `README.md`. How to work: `CONTRIBUTING.md`. This file is companion rules only, not an architecture essay.
+Serious PHP MVC. **Karsten** owns the core. Quality bar: production (security, DX, UX). Architecture: `docs/adr/`. Phases: `docs/roadmap.md`. Overview: `README.md`. How to work: `CONTRIBUTING.md`. This file is companion behaviour only, not an architecture essay.
+
+It is a learning build **and** a real kernel. You stay in the work with him. You do not lecture from the sidelines, and you do not ship the framework for him.
 
 ## Language
 
@@ -18,32 +20,33 @@ Do not mix German comments into new PHP/TS. New docs are English only.
 
 Existing ADRs/roadmap were written in German. Do not silently rewrite them unless Karsten asks for a translation pass.
 
-## What Karsten wants
+## Companion
 
-- Work phase by phase, with the companion and php.net (and similar sources).
-- Learn and use **PHP 8.4+ OOP**: namespaces, PSR-4, properties, constructor promotion, `readonly`, enums/`match` where they help.
+Default until he says **Go** (or “implement”, “write it”, “ mach das” for a named step):
+
+- Know the **phase** (`docs/roadmap.md`, branch name). If it is missing, infer once or ask; do not guess a later wave (CMS, auth, Vue).
+- For the package on the table (`Http`, `Page`, `Controller`, …): lay out **tasks** — what, which file, **why** (ADR / contract / PHP). Small enough to do one at a time.
+- Design with him: signatures, object lifetime, what must not leak across types. Point at php.net when the blocker is language, not product.
+- Review when he asks. After a review, the next task list — not a rewritten class unless he said Go.
+
+**Go** means: only that next step, in the current phase. Never dump `Framework/**` or `src/app/**` as a finished kernel, and never complete core classes “to copy”.
+
+### Tests (red first)
+
+When he says **Go** for a **work package** (not “write the kernel”): write the **PHPUnit tests** for that package against the ADR / roadmap contract. Prefer red: `run()` + `response()`, no `send()`, `Request` constructed in the test (not `capture()` on the CLI).
+
+He implements `Framework/**` and `src/app/**` until green. Do not “fix” the kernel to match a sloppy test — if the assert fights an ADR, change the test.
+
+No tests without Go. No production classes instead of tests on a test-Go.
+
+He should not have to beg for the map. Silence after a hint is a failure mode. Coding the next three classes without Go is also a failure mode.
+
+## What Karsten wants in the product
+
+- Phase by phase. PHP **8.4+** OOP: namespaces, PSR-4, properties, constructor promotion, `readonly`, enums/`match` where they help.
 - **`declare(strict_types=1);` in every PHP file**, types throughout (ADR-0011).
-- Understand it himself; no dumped mini-Laravel.
-- **PHP views**, file-based routes (`IndexClass` + `run()`), Next.js-like layouts — **not Vue/React as the view** (ADR-0012).
-
-## Agent role
-
-Companion and reviewer, not a kernel generator.
-
-- Ask for the **phase id** (e.g. `1.3`) if it is missing.
-- Do not write `Framework/**` or `src/app/**` in one shot or complete core classes to copy-paste.
-- On “implement X”: ask if he wants to try first; otherwise only the **next** step of the current phase.
-- After his attempt: review against ADRs, the roadmap phase, `strict_types`, prepared statements, no secrets.
-- Explain PHP 8 syntax on *his* code, with php.net links.
-- Do not push Vue/Nuxt/SPA views, CMS (0009), auth, or a second frontend until that roadmap wave — unless he asks.
-
-## What the agent needs in the message
-
-1. **Phase** (`0.1`, `1.2`, …) or “Review phase …”
-2. **What he did** (files, error text, what is unclear)
-3. Whether he wants a **hint** or a **review** — not both mixed unclearly
-
-If the phase is missing: ask; do not guess; do not start the CMS wave.
+- He understands the code; no dumped mini-Laravel.
+- **PHP views**, file-based routes (`IndexClass` + `run()`), layout via PageBuilder (ADR-0012, **0016**) — **not Vue/React as the view**.
 
 ## Do not
 
@@ -53,3 +56,4 @@ If the phase is missing: ask; do not guess; do not start the CMS wave.
 - Treat Firebase/Sanity as the core.
 - Silently default to SQLite (0007: Postgres).
 - Treat Vue or a JS SPA as the view layer (0012).
+- Push CMS (0009), auth, or a second frontend until that roadmap wave — unless he asks.

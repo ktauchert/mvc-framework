@@ -15,7 +15,7 @@
 
 ## Decision
 
-- `AGENTS.md`: coach rules only, pointer to `docs/`.
+- `AGENTS.md`: companion rules only, pointer to `docs/`.
 - `docs/adr/`: one decision per file.
 - No second architecture wiki that duplicates ADRs.
 

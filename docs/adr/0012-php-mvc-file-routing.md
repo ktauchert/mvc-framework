@@ -3,6 +3,7 @@
 - Status: Accepted
 - Date: 2026-10-13
 - Supersedes: ADR-0002 (view coupling), ADR-0004 (first JS frontend), ADR-0005 (`make:page` for SPA), ADR-0006 (JS frontend adapters)
+- Amended by: [ADR-0017](0017-api-file-routes.md) (JSON file routes: `/api/…`, `RouteClass`)
 
 ## Context
 
@@ -16,7 +17,7 @@ Code this ADR describes (snapshot):
 - `composer make-route` / `scripts/make-route.php` scaffolds that file.
 - Error HTML: `Framework/Views/errors/{404,500}.php`.
 - PSR-4: `Framework\` → `Framework/`, `App\` → `src/app/`, `Api\` → `src/api/`.
-- Planned, not built: base `Controller`, `render()`, layouts (Next.js `layout.tsx` analogue).
+- Snapshot at write time: dispatcher still mixed. Later: thin `router.php`, `index.php` glue, base `Controller`, `render()`, layout via PageBuilder (ADR-0014, ADR-0016).
 
 ## Alternatives
 
@@ -29,9 +30,9 @@ Code this ADR describes (snapshot):
 Option 3.
 
 - **View = PHP.** No Vue/Nuxt/React/TanStack as the page renderer. No `frontend/` npm app as the main UI.
-- **Routing = files.** One folder segment = one URL segment. Controller class name: `IndexClass`, method `run()` until a richer HTTP mapping exists.
-- Controllers should extend a shared base **Controller** (to add). That base owns **render** (view + data) and **layouts** (wrap content, Next.js-like).
-- `src/api/` stays available for JSON resources; it is not the homepage renderer.
+- **Routing = files.** One folder segment = one URL segment. HTML class name: `IndexClass`, method `run()`. JSON: **ADR-0017** (`/api/…`, `RouteClass`, `ApiController`).
+- Controllers should extend a shared base **Controller**. That base owns **render** (view + data) and **layouts** (wrap content, Next.js-like).
+- `src/api/` is JSON file routes (ADR-0017), not the homepage renderer.
 - Composer does not install npm or Vue. Tailwind, if used, is CSS for PHP-rendered HTML.
 - Next.js is a **shape** (folders, layouts, a page module per route), not a Node runtime.
 
@@ -41,8 +42,9 @@ Option 3.
 |---|---|
 | `app/page.tsx` | `src/app/IndexClass.php` (home `/`) |
 | `app/test/page.tsx` | `src/app/test/IndexClass.php` (`/test`) |
-| default export / server render | `IndexClass::run()` |
-| `layout.tsx` | PHP layout + `render()` on the base Controller (planned) |
+| `app/api/…/route.ts` | `src/api/…/RouteClass.php` (`/api/…`, ADR-0017) |
+| default export / server render | `IndexClass::run()` / `RouteClass::run()` |
+| `layout.tsx` | `src/layout/` + `PageBuilder` + `Controller::render()` (ADR-0016) |
 | `not-found.tsx` | `Framework/Views/errors/404.php` |
 
 ## Consequences
