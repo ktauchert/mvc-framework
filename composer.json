@@ -20,13 +20,22 @@
       "Framework/helpers/autoload.php"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "scripts": {
     "serve": "php -S localhost:8000 -t public public/router.php",
+    "test": "@php vendor/bin/phpunit",
     "make-route": "php scripts/make-route.php",
     "assets": "sass src/styles/app.scss public/css/app.css",
     "assets:watch": "sass --watch src/styles/app.scss public/css/app.css"
   },
   "config": {
     "sort-packages": true
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^13"
   }
 }
