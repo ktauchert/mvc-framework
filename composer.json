@@ -1,6 +1,6 @@
 {
   "name": "ktauchert/mvc-framework",
-  "description": "PHP JSON API with a swappable SPA view",
+  "description": "PHP MVC with file-based routes and PHP views",
   "type": "project",
   "require": {
     "php": ">=8.4",
@@ -11,18 +11,31 @@
   "autoload": {
     "psr-4": {
       "Framework\\": "Framework/",
-      "App\\": "src/app/",
       "Api\\": "src/api/"
     },
+    "classmap": [
+      "src/app/"
+    ],
     "files": [
       "Framework/helpers/autoload.php"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "scripts": {
     "serve": "php -S localhost:8000 -t public public/router.php",
-    "make-route": "php scripts/make-route.php"
+    "test": "@php vendor/bin/phpunit",
+    "make-route": "php scripts/make-route.php",
+    "assets": "sass src/styles/app.scss public/css/app.css",
+    "assets:watch": "sass --watch src/styles/app.scss public/css/app.css"
   },
   "config": {
     "sort-packages": true
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^13"
   }
 }

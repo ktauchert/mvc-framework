@@ -19,7 +19,7 @@ Option 3 was “two inits (Composer + npm)”. **Amended by [ADR-0012](0012-php-
 
 - PHP: `composer install` / later `create-project` creates the PHP core.
 - Composer does not run `npm` or Vue/React scaffolding.
-- Locally: `composer serve` + Docker Postgres. Optional Tailwind CLI later is CSS tooling, not a second UI framework.
+- Locally: `composer serve` + Docker Postgres. CSS: Dart Sass binary + `composer assets` (ADR-0015), not npm. Tailwind would need a new ADR.
 
 ## Consequences
 

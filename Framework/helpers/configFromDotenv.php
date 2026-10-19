@@ -22,6 +22,9 @@ return [
     'dir' => [
         'base' => __DIR__ . '/../../',
         'app' => __DIR__ . '/../../src/app/',
+        'views' => __DIR__ . '/../../src/views/',
+        'layout' => __DIR__ . '/../../src/layout/',
+        'css' => __DIR__ . '/../../public/css/',
         'config' => __DIR__ . '/.',
         'public' => __DIR__ . '/../../public/',
         'storage' => __DIR__ . '/../../storage/',
