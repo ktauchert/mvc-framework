@@ -4,6 +4,7 @@
 /.obsidian/
 
 # later frontend build
+/public/css/*.css.map
 /public/build/
 /frontend/dist/
 
