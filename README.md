@@ -25,7 +25,7 @@ GET /test
   → IndexClass::run() → render → PageBuilder → Response::send()
 ```
 
-Scaffold: `composer make-route test`.
+Scaffold (phase 1.4): `php mvc make:page notes` (ADR-0018). JSON later: `php mvc make:api notes`.
 
 ## Status
 

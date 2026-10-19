@@ -4,6 +4,7 @@
 - Date: 2026-10-16
 - Depends on: ADR-0012 (file routes), ADR-0014 (`run` / `send`, one front controller)
 - Amends: ADR-0012 (`src/api/` was only “later JSON”); ADR-0014 (“API IndexClass”) — the API file is **`RouteClass`**, not `IndexClass`
+- Amended by: [ADR-0018](0018-mvc-cli.md) (`php mvc make:api` replaces `make-route --api`)
 
 ## Context
 
@@ -34,7 +35,7 @@ Option 4.
 
 - The first URL segment **`api`** selects the API tree. It is not a folder under `src/app/`.
 - Remaining segments map like pages: lowercase directories, namespace parts `ucfirst`.
-- **No view** for API routes. `make-route --api` must not write `src/views/`.
+- **No view** for API routes. `php mvc make:api` must not write `src/views/` or SCSS.
 
 ### Bases
 
@@ -63,16 +64,16 @@ Composer’s current `"Api\\": "src/api/"` PSR-4 entry is **replaced by classmap
 
 Glue does not care which tree it got, as long as the instance has `run()` and `send()`. Errors for API should become JSON later (wave 3 can split HTML vs JSON error answers). Until then, HTML error views on an `/api/` URL are acceptable but not the end state.
 
-### `make-route`
+### Scaffold (ADR-0018)
 
 ```bash
-composer make-route notes              # page: IndexClass + view
-composer make-route notes -- --api     # JSON: src/api/notes/RouteClass.php, no view
+php mvc make:page notes    # page: IndexClass + view (+ SCSS unless --no-scss)
+php mvc make:api notes     # JSON: src/api/notes/RouteClass.php, no view, no SCSS
 ```
 
-The argument is the resource path **without** a leading `api/`. `--api` adds the URL prefix and the `src/api/` tree. Do not also support `--no-view` as a third kind of route.
+The `make:api` argument is the resource path **without** a leading `api/`. The command adds the URL prefix and the `src/api/` tree. Do not use `--api` or `--no-view` on `make:page`.
 
-Implement **page** scaffolding first (templates, Meta, view). `--api` only after `ApiController` exists.
+Implement **page** scaffolding first (`make:page`). `make:api` only after `ApiController` exists (phase 1.5).
 
 ### What this is not
 
@@ -84,5 +85,5 @@ Implement **page** scaffolding first (templates, Meta, view). `--api` only after
 
 - Opening a file tells you the kind: `IndexClass` = HTML page, `RouteClass` = JSON endpoint.
 - `/notes` and `/api/notes` can coexist.
-- Wave 1 stays HTML until `ApiController` + Resolver branch land (roadmap phase after page `make-route`).
+- Wave 1 stays HTML until `ApiController` + Resolver branch land (roadmap phase after `make:page`).
 - Tests can `run()` an API class and read JSON from the Response without `send()`, same as pages.

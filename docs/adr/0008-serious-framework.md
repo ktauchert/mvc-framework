@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-10-10
+- Amended by: [ADR-0018](0018-mvc-cli.md) (CLI is `php mvc`, not `make-route`)
 
 ## Context
 
@@ -15,7 +16,7 @@
 
 ## Decision
 
-Option 3. Quality bar: prepared statements, deliberate auth/session, no secrets in the repo, predictable CLI (`make-route` and later commands), HTML pages that feel fast.
+Option 3. Quality bar: prepared statements, deliberate auth/session, no secrets in the repo, predictable CLI (`php mvc make:page` and later `make:api` / `make:model`, ADR-0018), HTML pages that feel fast.
 
 “Flavor” = later extras (CMS, API) on the same PHP kernel, plus persistence adapters (0007) — not a second frontend framework.
 

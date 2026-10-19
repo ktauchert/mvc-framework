@@ -19,7 +19,7 @@ src/views/{path}.php           Inner HTML for <main> (dots → folders)
 src/layout/                    Document shell + header/footer partials
 src/styles/                    SCSS → public/css/app.css
 src/api/{path}/RouteClass.php  JSON → GET /api/path (ADR-0017; not wired)
-scripts/make-route.php         composer make-route [-- --api later]
+mvc                            php mvc make:page | make:api (1.5) | make:model (later)
 ```
 
 ---
@@ -57,17 +57,17 @@ scripts/make-route.php         composer make-route [-- --api later]
 
 **Do not:** Vue. Do not build `component()` / Table TS yet (ADR-0013, later). Nested per-folder `layout.php` would be a new ADR. Do not call `send()` in tests. Pest is optional later; start with PHPUnit so the first test is plain PHP.
 
-### Phase 1.4 — Page `make-route` and classmap DX
+### Phase 1.4 — Page `make:page` and classmap DX
 
-**Goal:** Keep **classmap** for `src/app/` (lowercase folders; namespace `ucfirst`). Do not switch pages to PSR-4 — API will use the same rule (ADR-0017). Templates for `IndexClass` (`strict_types`, `extends Controller`, `run(): void`, Meta, `render`) plus matching view. Default: also an empty page SCSS under `src/styles/pages/…` and a matching `@use` in `src/styles/app.scss` (ADR-0015). `--no-scss` skips that. English stub text. Refuse overwrite without `--force`. After write: remind `composer dump-autoload`. Do not compile Sass from `make-route`.
+**Goal:** App CLI **`php mvc`** (ADR-0018). Keep **classmap** for `src/app/` (lowercase folders; namespace `ucfirst`). Do not switch pages to PSR-4 — API will use the same rule (ADR-0017). First command: `make:page` — templates for `IndexClass` (`strict_types`, `extends Controller`, `run(): void`, Meta, `render`) plus matching view. Default: also an empty page SCSS under `src/styles/pages/…` and a matching `@use` in `src/styles/app.scss` (ADR-0015). `--no-scss` skips that. English stub text. Refuse overwrite without `--force`. After write: remind `composer dump-autoload`. Do not compile Sass from `make:page`. `make:api` / `make:model` refuse until their phases.
 
-**Done when:** `composer make-route foo` produces a loadable page + view; `/foo` can be opened; `src/styles/pages/foo/index.scss` exists and `app.scss` `@use`s it; the Dev only fills that SCSS and runs `composer assets`.
+**Done when:** `php mvc make:page foo` produces a loadable page + view; `/foo` can be opened; `src/styles/pages/foo/index.scss` exists and `app.scss` `@use`s it; the Dev only fills that SCSS and runs `composer assets`.
 
-**Do not:** `--api` in this phase (`ApiController` does not exist yet). `--api` must never write SCSS.
+**Do not:** implement `make:api` in this phase (`ApiController` does not exist yet). `make:api` must never write SCSS.
 
 ### Phase 1.5 — JSON file routes (ADR-0017)
 
-**Goal:** `Framework\Core\ApiController` (`json` helper, `send()`, no `render`). Resolver: `/api` and `/api/…` → `Api\…\RouteClass`. Glue unchanged besides `false` from resolve. Composer: **classmap** `src/api/`, drop PSR-4 `Api\` when you add that classmap. `make-route --api` writes `src/api/{path}/RouteClass.php` only (no view, no SCSS). Argument without a leading `api/`.
+**Goal:** `Framework\Core\ApiController` (`json` helper, `send()`, no `render`). Resolver: `/api` and `/api/…` → `Api\…\RouteClass`. Glue unchanged besides `false` from resolve. Composer: **classmap** `src/api/`, drop PSR-4 `Api\` when you add that classmap. `php mvc make:api {path}` writes `src/api/{path}/RouteClass.php` only (no view, no SCSS). Argument without a leading `api/`.
 
 **Done when:** `GET /api/notes` hits the stub JSON; `GET /notes` is still a page if that page exists.
 
@@ -107,7 +107,7 @@ The Wave-1 smoke (autoload, `config()`, `/test` via `run()` + `response()`) alre
 
 ## Wave 4 — DX, components, CSS
 
-Harden `make-route` further if needed. `component()` helper (ADR-0013). Static PHP components first. Table + HTML-fragment endpoints after wave 2.
+Harden `php mvc` further if needed (`make:model` after persistence). `component()` helper (ADR-0013). Static PHP components first. Table + HTML-fragment endpoints after wave 2.
 
 CSS pipeline **already exists** (ADR-0015): `src/styles/` → `public/css/app.css`. Remaining CSS work is authoring and keeping partials in step with `src/layout/`. Optional Vite later for `*.ts` → `public/build/` — still PHP HTML, not a SPA. Tailwind would need a new ADR.
 
@@ -135,4 +135,4 @@ Sitemap/robots (0010), optional MySQL DSN, Composer create-project.
 
 ## Suggested next step
 
-Finish leftover **1.3** (types, Meta on `/test`, `require`, `response()` getter, **smoke test**). Home `/` if you want it. Then **1.4** (page `make-route` + view + page SCSS). **1.5** after that. Error `IndexClass` is **3.1**.
+Finish leftover **1.3** (types, Meta on `/test`, `require`, `response()` getter, **smoke test**). Home `/` if you want it. Then **1.4** (`php mvc make:page` + view + page SCSS). **1.5** (`make:api`) after that. Error `IndexClass` is **3.1**.

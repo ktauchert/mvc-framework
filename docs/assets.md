@@ -51,18 +51,18 @@ Add a partial, e.g. `src/styles/_buttons.scss`, then in `app.scss`:
 
 Load order in `app.scss` is the cascade. `src/layout/page.php` links `/css/app.css` via MetaInfo (ADR-0016). Partials under `src/styles/main/` follow the layout partials (`_header`, `_footer`, page).
 
-## Page SCSS (with `make-route`, phase 1.4)
+## Page SCSS (with `make:page`, phase 1.4)
 
 Do not hand-edit a second file under `public/css/` for a new route. When 1.4 lands:
 
 ```bash
-composer make-route notes
+php mvc make:page notes
 # src/app/notes/IndexClass.php
 # src/views/notes/index.php
 # src/styles/pages/notes/index.scss
 # @use 'pages/notes/index';  added in src/styles/app.scss
 ```
 
-Then fill `src/styles/pages/notes/index.scss` and let `composer assets` / `assets:watch` rebuild. `--no-scss` skips the stylesheet. `--api` never writes SCSS.
+Then fill `src/styles/pages/notes/index.scss` and let `composer assets` / `assets:watch` rebuild. `--no-scss` skips the stylesheet. `php mvc make:api` never writes SCSS (ADR-0018).
 
 Until that scaffold exists, add the file and the `@use` by hand using the same paths (ADR-0015).

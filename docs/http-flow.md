@@ -21,6 +21,7 @@ src/layout/page.php               Document shell; slots $header, $content, $foot
 src/layout/partials/_header.php   Default header
 src/layout/partials/_footer.php   Default footer
 src/styles/                       SCSS → public/css/app.css (ADR-0015)
+mvc                               php mvc make:page (1.4); make:api (1.5) — ADR-0018
 ```
 
 `component()` / `src/components/` come **after** the layout works (ADR-0013). Same idea: return HTML strings, still no `echo` in the page class.

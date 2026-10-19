@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-10-13
 - Supersedes: ADR-0002 (view coupling), ADR-0004 (first JS frontend), ADR-0005 (`make:page` for SPA), ADR-0006 (JS frontend adapters)
-- Amended by: [ADR-0017](0017-api-file-routes.md) (JSON file routes: `/api/…`, `RouteClass`)
+- Amended by: [ADR-0017](0017-api-file-routes.md) (JSON file routes: `/api/…`, `RouteClass`); [ADR-0018](0018-mvc-cli.md) (scaffold CLI: `php mvc make:page`, not `composer make-route`)
 
 ## Context
 
@@ -14,7 +14,7 @@ Code this ADR describes (snapshot):
 - `public/router.php` — PHP built-in-server hook **and** the dispatcher (not a thin `index.php` yet).
 - URL path → folder under `src/app/` → `IndexClass.php` → `run()`.
 - Example: `GET /test` → `src/app/test/IndexClass.php`, namespace `App\Controllers\Test`.
-- `composer make-route` / `scripts/make-route.php` scaffolds that file.
+- Scaffold (snapshot): `composer make-route` / `scripts/make-route.php`. **Now:** `php mvc make:page` (ADR-0018).
 - Error HTML: `Framework/Views/errors/{404,500}.php`.
 - PSR-4: `Framework\` → `Framework/`, `App\` → `src/app/`, `Api\` → `src/api/`.
 - Snapshot at write time: dispatcher still mixed. Later: thin `router.php`, `index.php` glue, base `Controller`, `render()`, layout via PageBuilder (ADR-0014, ADR-0016).
